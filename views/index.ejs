@@ -1,0 +1,113 @@
+<%- include("partials/header.ejs") %>
+   <!-- header section end -->
+   <!-- banner section start -->
+   <div class="banner_section layout_padding">
+      <div class="container">
+         <div class="row">
+            <div class="col-md-12">
+               <h1 class="banner_taital">Space For Your Ideas</h1>
+               <p class="banner_text">Unlock your creativity by booking the meeting room at the Enabling Technology
+                  Collaboratory. Our innovative space is designed for collaboration and brainstorming, allowing you to
+                  connect with others and bring your ideas to life. </p>
+               <div class="read_bt"><a href="#">Book Now</a></div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- banner section end -->
+   </div>
+   <!-- header section end -->
+   <!-- appointment section start -->
+   <div class="appointment_section">
+      <div class="container">
+         <div class="appointment_box">
+            <div class="row">
+               <div class="col-md-12">
+                  <h1 class="appointment_taital">Book <span style="color: #0cb7d6;">The Meeting Room</span></h1>
+               </div>
+            </div>
+            <div class="appointment_section_2">
+               <form action="/submit" method="post">
+                  <div class="row">
+                     <div class="col-md-4">
+                        <div class="form-group">
+                           <p class="doctorname_text">Number of Attendees</p>
+                           <select class="form-control" name="attendees" required>
+                              <option value="">Maximum Attendees</option>
+                              <option value="02">02</option>
+                              <option value="04">04</option>
+                              <option value="06">06</option>
+                              <option value="08">08</option>
+                              <option value="10">10</option>
+                              <option value="12">12</option>
+                           </select>
+                        </div>
+                     </div>
+                     <div class="col-md-4">
+                        <p class="doctorname_text">Choose Date</p>
+                        <input id="datepicker" width="234" />
+                        <input type="hidden" name="date" id="hiddenDate" hidden required>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="form-group">
+                           <label class="doctorname_text">Time Slots</label>
+                           <div class="custom-dropdown-checkbox" onclick="toggleDropdown()">
+                              <div class="selected-options-checkbox" required>Select Time Slots</div>
+                              <div class="dropdown-content-checkbox" id="timeSlotDropdown">
+                                 <label><input type="checkbox" name="timeSlots[]" value="08:00 AM" onchange="updateSelected()"> 08:00 AM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="09:00 AM" onchange="updateSelected()"> 09:00 AM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="10:00 AM" onchange="updateSelected()"> 10:00 AM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="11:00 AM" onchange="updateSelected()"> 11:00 AM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="12:00 PM" onchange="updateSelected()"> 12:00 PM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="01:00 PM" onchange="updateSelected()"> 01:00 PM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="02:00 PM" onchange="updateSelected()"> 02:00 PM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="03:00 PM" onchange="updateSelected()"> 03:00 PM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="04:00 PM" onchange="updateSelected()"> 04:00 PM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="05:00 PM" onchange="updateSelected()"> 05:00 PM</label>
+                                 <label><input type="checkbox" name="timeSlots[]" value="06:00 PM" onchange="updateSelected()"> 06:00 PM</label>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row">
+                     <!-- <div class="col-md-4">
+                        <p class="doctorname_text">Phone Number</p>
+                        <input type="text" class="email_text" placeholder="+65-XXXXXXXX" name="phone">
+                     </div> -->
+                     <div class="col-md-6">
+                        <p class="doctorname_text">Purpose of the Meeting</p>
+                        <input type="text" class="email_text" placeholder="Meeting Details" name="purpose">
+                     </div>
+                     <div class="col-md-6">
+                        <p class="doctorname_text" style="visibility: hidden;">Submit Button Hidden Label</p>
+                        <input class="read_bt_submit_button" type="submit" value="Submit">
+                     </div>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>
+   
+   <!-- appointment section end -->
+   <!-- about section start -->
+   <div class="about_section layout_padding">
+      <div class="container">
+         <div class="row">
+            <div class="col-md-6">
+               <h1 class="about_taital">About ETC</h1>
+               <p class="about_text">Welcome to the Enabling Technology Collaboration Center at Temasek Polytechnic! We
+                  are a vibrant hub dedicated to innovation, where creativity meets technology.</p>
+               <div class="about_bt"><a href="about.html">Read More</a></div>
+            </div>
+            <div class="col-md-6">
+               <div class="about_img"><img src="images/about-img.png"></div>
+            </div>
+         </div>
+      </div>
+      <div class="padding_bottom_index">
+      </div>
+   </div>
+   <!-- about section end -->
+   <%- include("partials/footer.ejs") %>
