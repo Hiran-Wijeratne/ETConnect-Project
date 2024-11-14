@@ -566,13 +566,14 @@ $(document).ready(function() {
 
     // Function to validate the start and end times
     function validateTimes() {
+		var selectedDate = $('#datepicker').val();
         const startTime = $startTime.val();
         const endTime = $endTime.val();
 
         // Remove any existing warning message
         $('#end-time-error').remove();
 
-        if (startTime && endTime) {
+        if (startTime !== "Select Your Start Time" && endTime !== "Select Your End Time") {
             const start24 = convertTo24Hour(startTime.toLowerCase());
             const end24 = convertTo24Hour(endTime.toLowerCase());
 
@@ -584,11 +585,16 @@ $(document).ready(function() {
 
                 // Disable submit button
                 $submitButton.prop('disabled', true);
-            } else {
+            } else if (end24 > start24) {
+				if (selectedDate) {
                 // Enable submit button
                 $submitButton.prop('disabled', false);
+				}
             }
-        }
+        }else {
+			// If either start or end time is not selected, disable the submit button
+			$submitButton.prop('disabled', true);
+		}
     }
 
     // Validate times whenever the start or end time is changed
