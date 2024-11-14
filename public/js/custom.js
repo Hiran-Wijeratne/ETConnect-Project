@@ -393,46 +393,119 @@ $(function () {
 
 });
 
+// custom css 
 
-// custom javascript
 
-// JavaScript to show the second form when 'Next' is clicked
 
-  $(document).ready(function() {
+
+$(document).ready(function() {
     // Event listener for the "Next" button
     $('#nextButton').on('click', function() {
         // Get the selected date from the datepicker
         var selectedDate = $('#datepicker').val();
-        
+
         // Set the hidden input with the selected date
         $('#hiddenDate').val(selectedDate);
-        
+
         // Display the chosen date in the second form section
-        $('.doctorname_text_chosen_date').text('Your selected meeting date is ' + selectedDate);
+        if (selectedDate) {
+			$('.doctorname_text_chosen_date').text('Your selected meeting date is ' + selectedDate).removeClass('red-text');
+		} else {
+			$('.doctorname_text_chosen_date').text('You have not selected a date').addClass('red-text');
+		}
 
         console.log('Selected Date:', selectedDate); // For debugging
         console.log('Form Data:', $('form').serialize()); // Log all form data
 
-		$.ajax({
-            url: '/next', // Update this URL to match your backend endpoint
-            type: 'POST',
-            data: {
-                date: selectedDate
-            },
-            success: function(response) {
-                console.log('Date sent successfully:', response);
-            },
-            error: function(error) {
-                console.error('Error sending date:', error);
-            }
-        });
+        // Function to convert 24-hour format time to 12-hour AM/PM format
+        function convertToAmPmFormat(time24) {
+            const [hours, minutes] = time24.split(':');
+            let ampm = 'am';
+            let hours12 = parseInt(hours, 10);
 
+            if (hours12 >= 12) {
+                ampm = 'pm';
+                if (hours12 > 12) {
+                    hours12 -= 12; // Convert hours to 12-hour format
+                }
+            } else if (hours12 === 0) {
+                hours12 = 12; // Midnight case
+            }
+
+            return `${hours12.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+        }
+
+        // AJAX call to get the available timeslots for the selected date
+		$.ajax({
+			url: '/next', // Ensure this URL matches your backend endpoint
+			type: 'POST',
+			data: {
+				date: selectedDate
+			},
+			success: function(response) {
+				console.log('Date sent successfully:', response);
+				
+				// Access the timeslots and end_times arrays from the response
+				const timeslots = response.timeslots;
+				const endTimes = response.end_times;
+		
+				console.log('Timeslots for selected date:', timeslots);
+				console.log('End times for selected date:', endTimes);
+		
+				//Disable corresponding options in the "end" select dropdown based on end_time
+				endTimes.forEach(endTime => {
+					// Convert the 24-hour end time to 12-hour AM/PM format
+					const endTimeValue = convertToAmPmFormat(endTime);
+					console.log('Converted end time:', endTimeValue);
+		
+					// Disable the corresponding option in the "end" select dropdown
+					$('select[name="end"] option').each(function() {
+						if ($(this).text() === endTimeValue) {
+							$(this).prop('disabled', true).addClass('disabled-option');;  // Disable the matching option
+						}
+					});
+				});
+		
+				 // Disable corresponding options in the "start" and "end" select dropdowns based on timeslots
+				 timeslots.forEach(slot => {
+					const timeslotValue = convertToAmPmFormat(slot);
+					console.log('Converted timeslot:', timeslotValue);
+			
+					// Disable the corresponding option in the "start" select dropdown
+					$('select[name="start"] option').each(function() {
+						if ($(this).text() === timeslotValue) {
+							$(this).prop('disabled', true).addClass('disabled-option');;
+						}
+					});
+			
+					// Disable the corresponding option in the "end" select dropdown
+					$('select[name="end"] option').each(function() {
+						if ($(this).text() === timeslotValue) {
+							$(this).prop('disabled', true).addClass('disabled-option');;
+						}
+					});
+				});
+
+				// Optional: Display the available timeslots for debugging
+				const timeslotList = $('#timeslotList');
+				timeslotList.empty(); // Clear previous timeslots
+				timeslots.forEach(slot => {
+					const formattedTime = convertToAmPmFormat(slot.timeslot);
+					timeslotList.append(`<li>${formattedTime}</li>`);
+				});
+			},
+			error: function(error) {
+				console.error('Error sending date:', error);
+			}
+		});
+		
         // Hide the first form section and show the second form section
         $('#firstForm').hide();
         $('#secondForm').show();
     });
 
-	$('#appointmentForm').on('submit', function(event) {
+    // Event listener for the form submission
+    $('#appointmentForm').on('submit', function(event) {
         event.preventDefault(); // Prevent default form submission
 
         // Get form data
@@ -465,7 +538,93 @@ $(function () {
         // Hide the second form section and show the first form section
         $('#secondForm').hide();
         $('#firstForm').show();
+		$('select[name="start"] option, select[name="end"] option').prop('disabled', false).removeClass('disabled-option');
+		$('#end-time-error').remove(); 
     });
+
+
+
+    const $startTime = $('select[name="start"]');
+    const $endTime = $('select[name="end"]');
+    const $submitButton = $('input[type="submit"]');
+    const $nextButton = $('#nextButton');
+    const $backButton = $('#backButton');
+    const $firstForm = $('#firstForm');
+    const $secondForm = $('#secondForm');
+
+    // Disable the submit button initially
+    $submitButton.prop('disabled', true);
+
+    // Function to convert time format to comparable 24-hour format
+    function convertTo24Hour(time) {
+        const [timeStr, modifier] = time.split(' ');
+        let [hours, minutes] = timeStr.split(':');
+        if (modifier === 'pm' && hours !== '12') hours = parseInt(hours) + 12;
+        if (modifier === 'am' && hours === '12') hours = '00';
+        return `${hours}:${minutes}`;
+    }
+
+    // Function to validate the start and end times
+    function validateTimes() {
+        const startTime = $startTime.val();
+        const endTime = $endTime.val();
+
+        // Remove any existing warning message
+        $('#end-time-error').remove();
+
+        if (startTime && endTime) {
+            const start24 = convertTo24Hour(startTime.toLowerCase());
+            const end24 = convertTo24Hour(endTime.toLowerCase());
+
+            // Check if the end time is not later than the start time
+            if (end24 <= start24) {
+                // Add warning message
+                const error = $('<p id="end-time-error" style="color: red;">End time must be later than start time.</p>');
+                $endTime.parent().append(error);
+
+                // Disable submit button
+                $submitButton.prop('disabled', true);
+            } else {
+                // Enable submit button
+                $submitButton.prop('disabled', false);
+            }
+        }
+    }
+
+    // Validate times whenever the start or end time is changed
+    $startTime.on('change', validateTimes);
+    $endTime.on('change', validateTimes);
+
+    // Show the second form when the 'next' button is clicked
+    $nextButton.on('click', function() {
+        $firstForm.hide();
+        $secondForm.show();
+    });
+
+    // Hide the second form and reset values when the 'back' button is clicked
+    $backButton.on('click', function() {
+        $secondForm.hide();
+        $firstForm.show();
+
+        // Reset the form selections and remove warning message
+        $('#end-time-error').remove();  // Remove the warning
+        $startTime.val('');             // Reset start time selection to none
+        $endTime.val('');               // Reset end time selection to none
+        $submitButton.prop('disabled', true); // Disable the submit button
+    });
+
+    // Optional: Reset the form if the back button is clicked
+    $('#backButton').on('click', function() {
+        // Reset all time fields and disable submit
+        $startTime.val('');
+        $endTime.val('');
+        $submitButton.prop('disabled', true);
+        $('#end-time-error').remove();  // Remove any existing warning message
+    });
+	
+$('select[name="start"] option, select[name="end"] option').prop('disabled', false).removeClass('disabled-option');
 });
+
+
 
 

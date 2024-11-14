@@ -130,6 +130,35 @@
     text-align: left !important;
 
 }
+
+/* Style for disabled dropdown options */
+.disabled-option {
+    color: #eae7e7; /* Light gray color */
+    text-decoration: line-through; /* Optional: Strikethrough for extra visibility */
+    /* font-style: italic; /* Optional: Italicized to differentiate */
+} */
+
+input:disabled {
+    cursor: not-allowed !important;
+    background-color: rgba(200, 200, 200, 0.5) !important; /* Light gray background */
+    color: #999999 !important;  /* Light gray text */
+}
+
+input[type="submit"]:disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+input[type="submit"].read_bt_submit_button:disabled:hover {
+    title: "Please ensure that all fields are filled correctly.";
+}
+
+.red-text {
+    color: red;
+}
+
 /* custom css end */
 
 
