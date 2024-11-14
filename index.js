@@ -28,14 +28,18 @@ app.get("/mybookings", (req, res) => {
   res.render("mybookings.ejs");
 });
 
+app.post("/next", (req, res)=>{
+     console.log(req.body);
+});
+
 app.post('/submit', (req, res) => {
-  const { attendees, date, timeSlots, phone, purpose } = req.body;
+  const { attendees, date, start, end, purpose } = req.body;
 
   // Process the data
   console.log('Attendees:', attendees);
   console.log('Date:', date);
-  console.log('Time Slots:', timeSlots); // This will be an array
-  console.log('Phone:', phone);
+  console.log('start:', start); // This will be an array
+  console.log('end:', end);
   console.log('Purpose:', purpose);
 
   // You can now handle the data, e.g., save it to a database or send a response

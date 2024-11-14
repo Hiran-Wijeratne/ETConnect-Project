@@ -395,87 +395,49 @@ $(function () {
 
 
 // custom javascript
-// custom dropdown javascript
-function toggleDropdown() {
-    const dropdown = document.getElementById("timeSlotDropdown");
-    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-}
 
-// Update selected time slots in the display area
-function updateSelected(event) {
-    // Prevent this click from propagating to the window
-    event.stopPropagation();
+// JavaScript to show the second form when 'Next' is clicked
 
-    const checkboxes = document.querySelectorAll('#timeSlotDropdown input[type="checkbox"]');
-    const selectedOptions = [];
+  $(document).ready(function() {
+    // Event listener for the "Next" button
+    $('#nextButton').on('click', function() {
+        // Get the selected date from the datepicker
+        var selectedDate = $('#datepicker').val();
+        
+        // Set the hidden input with the selected date
+        $('#hiddenDate').val(selectedDate);
+        
+        // Display the chosen date in the second form section
+        $('.doctorname_text_chosen_date').text('Your selected meeting date is ' + selectedDate);
 
-    // Count how many checkboxes are selected
-    checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            selectedOptions.push(checkbox.value);
-        }
-    });
+        console.log('Selected Date:', selectedDate); // For debugging
+        console.log('Form Data:', $('form').serialize()); // Log all form data
 
-    // If more than 4 are selected, uncheck the clicked checkbox and show the alert
-    if (selectedOptions.length > 4) {
-        // Show a custom alert message next to the checkbox
-        const errorMessage = document.createElement('div');
-        errorMessage.classList.add('custom-alert');
-        errorMessage.innerHTML = '<span>You can select a maximum of 4 time slots.</span>';
-        errorMessage.style.color = 'red';
-        errorMessage.style.fontSize = '12px';
-        errorMessage.style.marginLeft = '5px';
-        errorMessage.style.padding = '5px';
-        errorMessage.style.border = '1px solid red';
-        errorMessage.style.borderRadius = '5px';
-        errorMessage.style.backgroundColor = '#f8d7da';
-
-        // Find the parent element of the clicked checkbox to append the message
-        const checkboxLabel = event.target.closest('label');
-        if (checkboxLabel) {
-            // If an error message is already there, replace it
-            const existingMessage = checkboxLabel.querySelector('.custom-alert');
-            if (existingMessage) {
-                existingMessage.remove();
+		$.ajax({
+            url: '/next', // Update this URL to match your backend endpoint
+            type: 'POST',
+            data: {
+                date: selectedDate
+            },
+            success: function(response) {
+                console.log('Date sent successfully:', response);
+            },
+            error: function(error) {
+                console.error('Error sending date:', error);
             }
-            checkboxLabel.appendChild(errorMessage);
-        }
+        });
 
-        // Uncheck the clicked checkbox
-        event.target.checked = false;
-
-        // Automatically remove the error message after 3 seconds
-        setTimeout(() => {
-            errorMessage.remove();
-        }, 3000);
-
-        return; // Exit the function to prevent further actions
-    }
-
-    // Clear any previous error messages when valid selections are made
-    document.querySelectorAll('#timeSlotDropdown label').forEach(label => {
-        const existingMessage = label.querySelector('.custom-alert');
-        if (existingMessage) {
-            existingMessage.remove();
-        }
+        // Hide the first form section and show the second form section
+        $('#firstForm').hide();
+        $('#secondForm').show();
     });
 
-    // Update the display with the selected time slots
-    document.querySelector('.selected-options-checkbox').textContent = selectedOptions.length > 0 ? selectedOptions.join(', ') : 'Select Time Slots';
-}
-
-// Close the dropdown if the user clicks outside of it (excluding the dropdown itself)
-window.onclick = function(event) {
-    const dropdown = document.getElementById("timeSlotDropdown");
-    const customDropdown = document.querySelector('.custom-dropdown-checkbox');
-
-    // If the click was outside the dropdown, close the dropdown
-    if (!customDropdown.contains(event.target)) {
-        dropdown.style.display = "none";
-    }
-};
-
-// Attach updateSelected to each checkbox
-document.querySelectorAll('#timeSlotDropdown input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('click', updateSelected);
+    // Event listener for the "Back" button
+    $('#backButton').on('click', function() {
+        // Hide the second form section and show the first form section
+        $('#secondForm').hide();
+        $('#firstForm').show();
+    });
 });
+
+

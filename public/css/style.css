@@ -72,7 +72,7 @@
 
   /* custom css for the submit button of the appointment form */
 
-  .read_bt_submit_button{
+  .read_bt_next_button{
     width: 100%;
     float: left;
     font-size: 16px;
@@ -84,67 +84,53 @@
     text-transform: uppercase;
     border-color: white;
 }
+
+.read_bt_submit_button{
+    width: 100%;
+    float: center;
+    font-size: 16px;
+    background-color: #0cb7d6;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    border-color: white;
+}
+
 .read_bt_submit_button:hover{
     color: #252525;
     background-color: #ffffff;
 }
 
-
-
-/* Custom Dropdown menu */
-.form-group-timeslot {
-    font-size: 18px;
- }
- 
- .custom-dropdown-checkbox {
-    position: relative;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 4px;
-    font-size: 16px;
- }
- 
- .dropdown-content-checkbox {
-    display: none; /* Change to 'block' to see dropdown while testing */
-    position: absolute;
-    background-color: #f9f9f9;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
+/* custom date picker css */
+ .doctorname_text_date{
     width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    padding: 5px;
- }
- 
- .dropdown-content-checkbox label {
-    display: inline-flex;
-    width: 48%; /* Each label takes up nearly half the width */
-    margin: 2px 0;
-    font-size: 18px; /* Increased font size for readability */
-    padding:15px 0px;
- }
- 
- .dropdown-content-checkbox label input[type="checkbox"] {
-    margin-right: 8px; /* Space between checkbox and label text */
-    padding:10px 0px;
- }
- 
- .dropdown-content-checkbox label:hover {
-    background-color: #ddd;
- }
- 
- .selected-options-checkbox {
-    color: #777;
- }
- 
+    float: left;
+    text-align: left;
+    margin: 0px 0px 32px 0px;
+    font-size: 16px;
+    color: #898989;
+    padding-bottom: 10px 0px 50px 0px;
+} 
 
+
+ /* selected date test styling */
+
+.doctorname_text_chosen_date{
+    width: 100%;
+    float: left;
+    font-size: 18px;
+    color: #393838;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    border: 1px solid #ffffff !important;
+    text-align: left !important;
+
+}
 /* custom css end */
-
-
-
-
-
 
 
 
@@ -580,7 +566,6 @@ button {
     padding-top: 50px;
 }
 
-
 .read_bt a {
     width: 100%;
     float: left;
@@ -673,26 +658,7 @@ button {
 }
 
 
-.nice-select {
-    -webkit-appearance: none;  /* Vendor prefix for WebKit-based browsers (Chrome, Safari) */
-    -moz-appearance: none;     /* Vendor prefix for Firefox */
-    appearance: none;          /* Standard property for compatibility */
-    
-    /* Your other styles */
-    width: 100%;
-    height: 50px;
-    border-radius: 5px;
-    border: 1px solid #cfcfcf !important;
-    padding: 10px 20px;
-    font-size: 18px;
-    color: #898989;
-    background-image: url(../images/down-arrow.png);
-    background-repeat: no-repeat;
-    background-size: 15px;
-    background-position: 96% center;
-    padding-left: 15px !important;
-    background: transparent;
-}
+
 
 
 span.input-group-addon {
