@@ -432,6 +432,34 @@ $(function () {
         $('#secondForm').show();
     });
 
+	$('#appointmentForm').on('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        // Get form data
+        var formData = $(this).serialize(); // Serialize the form data for submission
+
+        // Send form data to backend via AJAX
+        $.ajax({
+            url: '/submit', // Update with your backend submit endpoint
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                // Log success response
+                console.log('Form submitted successfully:', response);
+
+                // Clear the form fields after successful submission
+                $('#appointmentForm')[0].reset(); // Resets all form inputs
+
+                // Optionally, you can hide or reset any additional form sections if needed
+                $('#firstForm').show(); // Example: Reset the view to the first form
+                $('#secondForm').hide(); // Example: Hide the second form section
+            },
+            error: function(error) {
+                console.error('Error submitting form:', error);
+            }
+        });
+    });
+
     // Event listener for the "Back" button
     $('#backButton').on('click', function() {
         // Hide the second form section and show the first form section
