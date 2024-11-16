@@ -669,7 +669,7 @@ button {
     border: 1px solid #cfcfcf !important;
     padding: 10px 20px;
     font-size: 18px;
-    color: #898989;
+    color: #898989 !important;
     
     /* Vendor prefixes for appearance */
     -webkit-appearance: none;  /* For WebKit-based browsers (Chrome, Safari) */

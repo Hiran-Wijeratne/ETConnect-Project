@@ -44,55 +44,39 @@ app.post('/next', async (req, res) => {
   const formattedDate = `${year}-${month}-${day}`;
 
   try {
-      // Step 1: Query the bookings table to get booking_ids and their respective end_times for the selected date
-      const bookingsResult = await pool.query(
-          `SELECT booking_id, start_time, end_time FROM bookings WHERE date = $1`,
-          [formattedDate]
-      );
+    // Step 1: Query the bookings table to get booking_ids and their respective end_times for the selected date
+    const bookingsResult = await pool.query(
+      `SELECT booking_id, start_time, end_time FROM bookings WHERE date = $1`,
+      [formattedDate]
+    );
 
-      // If no bookings found, send an empty response
-      if (bookingsResult.rows.length === 0) {
-          return res.json({ timeslots: [], end_times: [],start_times:[] });
-      }
+    // If no bookings found, send an empty response
+    if (bookingsResult.rows.length === 0) {
+      return res.json({ timeslots: [], end_times: [], start_times: [] });
+    }
 
-      // Step 2: Extract booking_ids from the result
-      const bookingIds = bookingsResult.rows.map(row => row.booking_id);
+    // Step 2: Extract booking_ids from the result
+    const bookingIds = bookingsResult.rows.map(row => row.booking_id);
 
-      // Step 3: Query the timeslots table for all timeslots related to those booking_ids
-      const timeslotsResult = await pool.query(
-          `SELECT timeslot, booking_id FROM timeslots WHERE booking_id = ANY($1)`,
-          [bookingIds]
-      );
+    // Step 3: Query the timeslots table for all timeslots related to those booking_ids
+    const timeslotsResult = await pool.query(
+      `SELECT timeslot, booking_id FROM timeslots WHERE booking_id = ANY($1)`,
+      [bookingIds]
+    );
 
-      // Step 4: Extract timeslots and end_times
-      const timeslots = timeslotsResult.rows.map(row => row.timeslot);
-      const endTimes = bookingsResult.rows.map(row => row.end_time);  // Get end_times from the bookings table
-      const startTimes = bookingsResult.rows.map(row => row.start_time);
+    // Step 4: Extract timeslots and end_times
+    const timeslots = timeslotsResult.rows.map(row => row.timeslot);
+    const endTimes = bookingsResult.rows.map(row => row.end_time);  // Get end_times from the bookings table
+    const startTimes = bookingsResult.rows.map(row => row.start_time);
 
-      // Step 5: Send the timeslot and end_time data to the frontend
-      res.json({ timeslots, end_times: endTimes, start_times:startTimes });
+    // Step 5: Send the timeslot and end_time data to the frontend
+    res.json({ timeslots, end_times: endTimes, start_times: startTimes });
   } catch (error) {
-      console.error('Error fetching timeslots and end_times:', error);
-      res.status(500).send('Error fetching timeslots and end_times');
+    console.error('Error fetching timeslots and end_times:', error);
+    res.status(500).send('Error fetching timeslots and end_times');
   }
 });
 
-
-
-// Convert 12-hour time to 24-hour format
-function convertTo24HourFormat(time12h) {
-  const [time, modifier] = time12h.split(' ');
-  let [hours, minutes] = time.split(':');
-
-  if (modifier.toLowerCase() === 'pm' && hours !== '12') {
-    hours = (parseInt(hours) + 12).toString();
-  }
-  if (modifier.toLowerCase() === 'am' && hours === '12') {
-    hours = '00';
-  }
-
-  return `${hours}:${minutes}`;
-}
 
 // Submit route to process and store booking data
 app.post('/submit', async (req, res) => {
@@ -104,35 +88,37 @@ app.post('/submit', async (req, res) => {
   // Reformat date and convert times to 24-hour format
   const [day, month, year] = date.split('-');
   const formattedDate = `${year}-${month}-${day}`;
-  const startTime24 = convertTo24HourFormat(start);
-  const endTime24 = convertTo24HourFormat(end);
 
   try {
     // Step 1: Insert booking details into the bookings table
     const bookingResult = await pool.query(
       `INSERT INTO bookings (user_id, date, start_time, end_time, description, attendees, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING booking_id`,
-      [1, formattedDate, startTime24, endTime24, purpose, attendees] // Assume user_id = 1 for this example
+      [1, formattedDate, start, end, purpose, attendees] // Assume user_id = 1 for this example
     );
     const bookingId = bookingResult.rows[0].booking_id;
-  
+
     // Step 2: Generate timeslots and insert them into the timeslots table
     const timeslots = [];
-    let currentSlot = new Date(`1970-01-01T${startTime24}:00Z`);
-    const endSlot = new Date(`1970-01-01T${endTime24}:00Z`);
 
-    while (currentSlot < endSlot) {
-      const slotTime = currentSlot.toISOString().substring(11, 16); // "HH:MM" format
+    // Ensure start and end are Date objects
+    let startTime = new Date(`1970-01-01T${start}`); // Convert to Date object
+    let endTime = new Date(`1970-01-01T${end}`);     // Convert to Date object
+
+    while (startTime < endTime) {
+      // Format the current time into "HH:mm"
+      const slotTime = startTime.toTimeString().substring(0, 5);
       timeslots.push(slotTime);
 
       // Insert each timeslot into the timeslots table
       await pool.query(
         `INSERT INTO timeslots (booking_id, timeslot)
-         VALUES ($1, $2)`,
+     VALUES ($1, $2)`,
         [bookingId, slotTime]
       );
 
-      currentSlot.setHours(currentSlot.getHours() + 1); // Move to the next hour
+      // Increment the start time by 1 hour
+      startTime.setHours(startTime.getHours() + 1);
     }
 
     res.send({ message: 'Form submitted successfully', timeslots, formattedDate });
