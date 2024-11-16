@@ -399,6 +399,26 @@ $(function () {
 
 
 $(document).ready(function() {
+
+	// function checkFields() {
+    //     var attendees = $('#attendees').val();
+    //     var date = $('#datepicker').val();
+    //     var purpose = $('#purpose').val();
+
+    //     // Check if all required fields are filled
+    //     if (attendees !=="Maximum Attendees" && purpose !== "") {
+    //         $('#nextButton').prop('disabled', false);  // Enable 'Next' button
+    //     } else {
+    //         $('#nextButton').prop('disabled', true);  // Keep 'Next' button disabled
+    //     }
+    // }
+
+	// // Monitor changes on the input fields
+    // $('#attendees').on('change', checkFields);
+    // $('#datepicker').on('change', checkFields);
+    // $('#purpose').on('input', checkFields);  // 'input' event for text input fields
+	// });
+
     // Event listener for the "Next" button
     $('#nextButton').on('click', function() {
         // Get the selected date from the datepicker
@@ -447,9 +467,12 @@ $(document).ready(function() {
 				
 				// Access the timeslots and end_times arrays from the response
 				const timeslots = response.timeslots;
+				const startTimes =response.start_times;
 				const endTimes = response.end_times;
+				
 		
 				console.log('Timeslots for selected date:', timeslots);
+				console.log('Start times for selected date:', startTimes);
 				console.log('End times for selected date:', endTimes);
 		
 				//Disable corresponding options in the "end" select dropdown based on end_time
@@ -465,6 +488,8 @@ $(document).ready(function() {
 						}
 					});
 				});
+
+				
 		
 				 // Disable corresponding options in the "start" and "end" select dropdowns based on timeslots
 				 timeslots.forEach(slot => {
@@ -486,6 +511,21 @@ $(document).ready(function() {
 					});
 				});
 
+				//enable corresponding options in the "end" select dropdown based on start_time
+				startTimes.forEach(startTime => {
+					// Convert the 24-hour end time to 12-hour AM/PM format
+					const startTimeValue = convertToAmPmFormat(startTime);
+					console.log('Converted start time:', startTimeValue);
+		
+					// enable the corresponding option in the "end" select dropdown
+					$('select[name="end"] option').each(function() {
+						if ($(this).text() === startTimeValue) {
+							$(this).prop('disabled', false).removeClass('disabled-option');  // Disable the matching option
+						}
+					});
+				});
+		
+
 				// Optional: Display the available timeslots for debugging
 				const timeslotList = $('#timeslotList');
 				timeslotList.empty(); // Clear previous timeslots
@@ -501,7 +541,9 @@ $(document).ready(function() {
 		
         // Hide the first form section and show the second form section
         $('#firstForm').hide();
+		$submitButton.prop('disabled', true);
         $('#secondForm').show();
+		
     });
 
     // Event listener for the form submission
@@ -602,10 +644,10 @@ $(document).ready(function() {
     $endTime.on('change', validateTimes);
 
     // Show the second form when the 'next' button is clicked
-    $nextButton.on('click', function() {
-        $firstForm.hide();
-        $secondForm.show();
-    });
+    // $nextButton.on('click', function() {
+    //     $firstForm.hide();
+    //     $secondForm.show();
+    // });
 
     // Hide the second form and reset values when the 'back' button is clicked
     $backButton.on('click', function() {

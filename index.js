@@ -46,13 +46,13 @@ app.post('/next', async (req, res) => {
   try {
       // Step 1: Query the bookings table to get booking_ids and their respective end_times for the selected date
       const bookingsResult = await pool.query(
-          `SELECT booking_id, end_time FROM bookings WHERE date = $1`,
+          `SELECT booking_id, start_time, end_time FROM bookings WHERE date = $1`,
           [formattedDate]
       );
 
       // If no bookings found, send an empty response
       if (bookingsResult.rows.length === 0) {
-          return res.json({ timeslots: [], end_times: [] });
+          return res.json({ timeslots: [], end_times: [],start_times:[] });
       }
 
       // Step 2: Extract booking_ids from the result
@@ -67,9 +67,10 @@ app.post('/next', async (req, res) => {
       // Step 4: Extract timeslots and end_times
       const timeslots = timeslotsResult.rows.map(row => row.timeslot);
       const endTimes = bookingsResult.rows.map(row => row.end_time);  // Get end_times from the bookings table
+      const startTimes = bookingsResult.rows.map(row => row.start_time);
 
       // Step 5: Send the timeslot and end_time data to the frontend
-      res.json({ timeslots, end_times: endTimes });
+      res.json({ timeslots, end_times: endTimes, start_times:startTimes });
   } catch (error) {
       console.error('Error fetching timeslots and end_times:', error);
       res.status(500).send('Error fetching timeslots and end_times');
@@ -95,7 +96,10 @@ function convertTo24HourFormat(time12h) {
 
 // Submit route to process and store booking data
 app.post('/submit', async (req, res) => {
-  const { attendees, date, start, end, purpose } = req.body;
+  let { attendees, date, start, end, purpose } = req.body;
+  // Set default values if attendees or purpose are not provided
+  attendees = attendees || 2;
+  purpose = purpose || 'Not Stated';
 
   // Reformat date and convert times to 24-hour format
   const [day, month, year] = date.split('-');
@@ -111,7 +115,7 @@ app.post('/submit', async (req, res) => {
       [1, formattedDate, startTime24, endTime24, purpose, attendees] // Assume user_id = 1 for this example
     );
     const bookingId = bookingResult.rows[0].booking_id;
-
+  
     // Step 2: Generate timeslots and insert them into the timeslots table
     const timeslots = [];
     let currentSlot = new Date(`1970-01-01T${startTime24}:00Z`);
