@@ -68,9 +68,10 @@ app.post('/next', async (req, res) => {
     const timeslots = timeslotsResult.rows.map(row => row.timeslot);
     const endTimes = bookingsResult.rows.map(row => row.end_time);  // Get end_times from the bookings table
     const startTimes = bookingsResult.rows.map(row => row.start_time);
+    
 
     // Step 5: Send the timeslot and end_time data to the frontend
-    res.json({ timeslots, end_times: endTimes, start_times: startTimes });
+    res.json({ timeslots, end_times: endTimes, start_times: startTimes, booking_ids:bookingIds });
   } catch (error) {
     console.error('Error fetching timeslots and end_times:', error);
     res.status(500).send('Error fetching timeslots and end_times');

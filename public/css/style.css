@@ -165,6 +165,58 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
     color: red;
 }
 
+
+.booking-item {
+    display: inline-block; /* Inline-block for side-by-side layout */
+    padding: 15px; /* Padding for spacing */
+    margin: 10px; /* Space between items */
+    width: calc(33.33% - 20px); /* Flexible width for a 3-column layout with margins */
+    vertical-align: top; /* Align items to the top */
+    border: 1px solid rgba(12, 183, 214, 0.2); /* Subtle border */
+    background-color: rgba(12, 183, 214, 0.1); /* Light tint of the primary color */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    transition: transform 0.3s, box-shadow 0.3s; /* Hover effects */
+}
+
+.booking-item:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    background-color: rgba(12, 183, 214, 0.2); /* Slightly darker background on hover */
+}
+
+.booking-item p {
+    margin: 0;
+    color: #333; /* Neutral text color */
+}
+
+.booking-item p strong {
+    color: #0cb7d6; /* Primary color for emphasis */
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .booking-item {
+        width: calc(50% - 20px); /* 2-column layout for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-item {
+        width: calc(100% - 20px); /* Full-width layout for mobile screens */
+    }
+}
+
+.booking-title {
+    font-size: 1.5rem;
+    color: #0cb7d6;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+
 /* custom css end */
 
 

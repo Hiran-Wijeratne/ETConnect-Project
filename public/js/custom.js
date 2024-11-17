@@ -512,11 +512,39 @@ $(document).ready(function () {
 				timeslots = response.timeslots;
 				startTimes = response.start_times;
 				endTimes = response.end_times;
+				bookingIds = response.booking_ids;
+
 
 				// Normalize the times
 				const normalizedEndTimes = endTimes.map(time => normalizeTimeFormat(time));
 				const normalizedTimeslots = timeslots.map(time => normalizeTimeFormat(time));
 				const normalizedStartTimes = startTimes.map(time => normalizeTimeFormat(time));
+
+				// Clear previous bookings
+				$('#bookingsList').empty(); 
+				
+				if (bookingIds.length > 0) {
+					const title = `<h3 class="booking-title">Current Booking Overview for ${selectedDate}</h3>`;
+					$('#bookingsList').append(title);
+				}
+				
+
+				// Populate the bookings
+				bookingIds.forEach((id, index) => {
+					const startTime = normalizedStartTimes[index];
+					const endTime = normalizedEndTimes[index];
+			
+					// Create a booking card or list item
+					const bookingItem = `
+						<div class="booking-item">
+							<p><strong>Booking ID:</strong> ${id}</p>
+							<p><strong>Start Time:</strong> ${startTime}</p>
+							<p><strong>End Time:</strong> ${endTime}</p>
+						</div>
+					`;
+					$('#bookingsList').append(bookingItem);
+				});
+
 
 				console.log('Normalized End Times:', normalizedEndTimes);
 				console.log('Normalized Timeslots:', normalizedTimeslots);
