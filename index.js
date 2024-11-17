@@ -24,8 +24,71 @@ const pool = new pg.Pool({
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.render("index.ejs");
+// Helper function to format dates
+const formatDate = (date) => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+app.get("/", async (req, res) => {
+  try {
+    // 1. Get bookings for the next 30 days
+    const today = new Date();
+    const thirtyDaysLater = new Date(today);
+    thirtyDaysLater.setDate(today.getDate() + 30);
+
+    // Query to get all bookings in the next 30 days
+    const bookingsResult = await pool.query(
+      `SELECT booking_id, date
+       FROM bookings
+       WHERE date >= $1 AND date <= $2`,
+      [today, thirtyDaysLater]
+    );
+
+    const upcomingBookings = bookingsResult.rows;
+
+    // 2. Initialize an object to track time slots for each day
+    const timeSlotsCount = {};
+
+    // 3. Loop through the bookings and get the time slots for each booking
+    for (const booking of upcomingBookings) {
+      const bookingId = booking.booking_id;
+      const bookingDate = booking.date;
+
+      // Query to get time slots for this booking
+      const timeSlotsResult = await pool.query(
+        `SELECT timeslot FROM timeslots
+         WHERE booking_id = $1`,
+        [bookingId]
+      );
+
+      // Count time slots for this booking and day
+      const timeSlotsForThisBooking = timeSlotsResult.rows.length;
+      const formattedDate = formatDate(new Date(bookingDate));
+
+      if (!timeSlotsCount[formattedDate]) {
+        timeSlotsCount[formattedDate] = 0;
+      }
+
+      timeSlotsCount[formattedDate] += timeSlotsForThisBooking;
+    }
+
+    // 4. Filter days with more than 10 time slots
+    const datesWithTooManyTimeSlots = [];
+    for (const date in timeSlotsCount) {
+      if (timeSlotsCount[date] > 9) {
+        datesWithTooManyTimeSlots.push(date);
+      }
+    }
+
+    // 5. Send dates with too many time slots to the front-end
+    res.render("index.ejs", { datesWithTooManyTimeSlots, footerData: datesWithTooManyTimeSlots });
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    res.status(500).send('Server Error');
+  }
 });
 
 app.get("/bookinglist", (req, res) => {

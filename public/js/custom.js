@@ -635,13 +635,14 @@ $(document).ready(function () {
 				// Log success response
 				console.log('Form submitted successfully:', response);
 
-				// Clear the form fields after successful submission
-				$('#appointmentForm')[0].reset(); // Resets all form inputs
+				// // Clear the form fields after successful submission
+				// $('#appointmentForm')[0].reset(); // Resets all form inputs
 
-				// Optionally, you can hide or reset any additional form sections if needed
-				$('#firstForm').show(); // Example: Reset the view to the first form
-				$('#secondForm').hide(); // Example: Hide the second form section
-				$nextButton.prop('disabled', true);
+				// // Optionally, you can hide or reset any additional form sections if needed
+				// $('#firstForm').show(); // Example: Reset the view to the first form
+				// $('#secondForm').hide(); // Example: Hide the second form section
+				// $nextButton.prop('disabled', true);
+				location.reload();
 			},
 			error: function (error) {
 				console.error('Error submitting form:', error);

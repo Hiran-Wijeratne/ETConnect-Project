@@ -64,7 +64,7 @@
       </div>
     </div>
   </div>
- 
+
 
   <!-- Second Form Section (Initially Hidden) -->
   <div class="appointment_section" id="secondForm" style="display: none;">
@@ -145,24 +145,36 @@
       </div>
     </div>
   </div>
-    <!-- appointment section end -->
-    <!-- about section start -->
-    <div class="about_section layout_padding">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6">
-            <h1 class="about_taital">About ETC</h1>
-            <p class="about_text">Welcome to the Enabling Technology Collaboration Center at Temasek Polytechnic!
-              We are a vibrant hub dedicated to innovation, where creativity meets technology.</p>
-            <div class="about_bt"><a href="about.html">Read More</a></div>
-          </div>
-          <div class="col-md-6">
-            <div class="about_img"><img src="images/about-img.png"></div>
-          </div>
+  <!-- appointment section end -->
+  <!-- about section start -->
+  <div class="about_section layout_padding">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h1 class="about_taital">About ETC</h1>
+          <p class="about_text">Welcome to the Enabling Technology Collaboration Center at Temasek Polytechnic!
+            We are a vibrant hub dedicated to innovation, where creativity meets technology.</p>
+            <% if (datesWithTooManyTimeSlots.length > 0) { %>
+              <!-- <div style="text-align: center; background-color: #f44336; color: white; padding: 20px; border-radius: 8px; margin-top: 20px;"> -->
+                <h1 style="font-size: 2.0em;">We are fully booked on:</h1>
+                <ul style="list-style-type: none;">
+                  <% datesWithTooManyTimeSlots.forEach(date => { %>
+                    <li style="font-size: 1.2em; margin-right: 50px; display: inline-block;">
+                      <%= date %>
+                    </li>
+                  <% }); %>
+                </ul>
+              <!-- </div> -->
+            <% } %>            
+          <div class="about_bt"><a href="about.html">Read More</a></div>
+        </div>
+        <div class="col-md-6">
+          <div class="about_img"><img src="images/about-img.png"></div>
         </div>
       </div>
-      <div class="padding_bottom_index">
-      </div>
     </div>
-    <!-- about section end -->
-    <%- include("partials/footer.ejs") %>
+    <div class="padding_bottom_index">
+    </div>
+  </div>
+  <!-- about section end -->
+  <%- include("partials/footer.ejs") %>
