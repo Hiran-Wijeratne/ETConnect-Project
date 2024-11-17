@@ -409,20 +409,20 @@ var purposeIsStated = false;
 
 // custom css 
 function onDateChange($datepickerElement) {
-    const selectedDate = $datepickerElement.val().trim();
-    const $nextButton = $('#nextButton'); // Adjust to your specific button selector
+	const selectedDate = $datepickerElement.val().trim();
+	const $nextButton = $('#nextButton'); // Adjust to your specific button selector
 
-    if (selectedDate !== '') {
+	if (selectedDate !== '') {
 		console.log("datepicker is selected");
 		dateSelectedCustomeDatepicker = true;
-		if(purposeIsStated){
-        $nextButton.prop('disabled', false); // Enable the button
+		if (purposeIsStated) {
+			$nextButton.prop('disabled', false); // Enable the button
 		}
-    } else {
+	} else {
 		dateSelectedCustomeDatepicker = false;
-        $nextButton.prop('disabled', true); // Disable the button
+		$nextButton.prop('disabled', true); // Disable the button
 		console.log("datepicker is selected");
-    }
+	}
 }
 
 
@@ -513,10 +513,6 @@ $(document).ready(function () {
 				startTimes = response.start_times;
 				endTimes = response.end_times;
 
-				console.log('Timeslots for selected date:', timeslots);
-				console.log('Start times for selected date:', startTimes);
-				console.log('End times for selected date:', endTimes);
-
 				// Normalize the times
 				const normalizedEndTimes = endTimes.map(time => normalizeTimeFormat(time));
 				const normalizedTimeslots = timeslots.map(time => normalizeTimeFormat(time));
@@ -556,6 +552,20 @@ $(document).ready(function () {
 					$('select[name="end"] option').each(function () {
 						if (normalizeTimeFormat($(this).text()) === startTime) {
 							$(this).prop('disabled', false).removeClass('disabled-option');
+						}
+					});
+				});
+
+				// **NEW LOGIC**: Disable overlapping times in the "end" dropdown.
+				// If any time in normalizedStartTimes is also in normalizedEndTimes, disable it in the "end" dropdown.
+				normalizedStartTimes.forEach(startTime => {
+					normalizedEndTimes.forEach(endTime => {
+						if (startTime === endTime) {
+							$('select[name="end"] option').each(function () {
+								if (normalizeTimeFormat($(this).text()) === startTime) {
+									$(this).prop('disabled', true).addClass('disabled-option');
+								}
+							});
 						}
 					});
 				});
@@ -721,7 +731,7 @@ $(document).ready(function () {
 	});
 
 
-	
+
 
 
 
@@ -733,11 +743,11 @@ $(document).ready(function () {
 		if (value.trim() === '' || value === placeholder) {
 			$nextButton.prop('disabled', true);
 			purposeIsStated = false;
-			
+
 		} else {
-			purposeIsStated=true;
-			if(dateSelectedCustomeDatepicker){
-			$nextButton.prop('disabled', false);
+			purposeIsStated = true;
+			if (dateSelectedCustomeDatepicker) {
+				$nextButton.prop('disabled', false);
 			}
 		}
 	}
