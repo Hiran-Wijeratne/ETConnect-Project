@@ -404,27 +404,49 @@ $(function () {
 
 
 
-
+var dateSelectedCustomeDatepicker = false;
+var purposeIsStated = false;
 
 // custom css 
+function onDateChange($datepickerElement) {
+    const selectedDate = $datepickerElement.val().trim();
+    const $nextButton = $('#nextButton'); // Adjust to your specific button selector
+
+    if (selectedDate !== '') {
+		console.log("datepicker is selected");
+		dateSelectedCustomeDatepicker = true;
+		if(purposeIsStated){
+        $nextButton.prop('disabled', false); // Enable the button
+		}
+    } else {
+		dateSelectedCustomeDatepicker = false;
+        $nextButton.prop('disabled', true); // Disable the button
+		console.log("datepicker is selected");
+    }
+}
 
 
-const $startTime = $('select[name="start"]');
-const $endTime = $('select[name="end"]');
-const $submitButton = $('input[type="submit"]');
-const $backButton = $('#backButton');
-const $firstForm = $('#firstForm');
-const $secondForm = $('#secondForm');
-const $nextButton = $('#nextButton');
-
-var noConflictingBookings = false;
-
-// Disable the submit button initially
-$submitButton.prop('disabled', true);
 
 
 
 $(document).ready(function () {
+
+	const $startTime = $('select[name="start"]');
+	const $endTime = $('select[name="end"]');
+	const $submitButton = $('input[type="submit"]');
+	const $backButton = $('#backButton');
+	const $firstForm = $('#firstForm');
+	const $secondForm = $('#secondForm');
+	const $nextButton = $('#nextButton');
+	const $purposeInput = $('input[name="purpose"]');
+	const $datepicker = $('#datepicker');
+
+	var noConflictingBookings = false;
+
+	// Disable the submit and next buttons initially
+	$submitButton.prop('disabled', true);
+	$nextButton.prop('disabled', true);
+
 
 	var timeslots = [];
 	let startTimes = [];
@@ -433,7 +455,7 @@ $(document).ready(function () {
 	// Event listener for the "Next" button
 	$nextButton.on('click', function () {
 		// Get the selected date from the datepicker
-		var selectedDate = $('#datepicker').val();
+		var selectedDate = $datepicker.val();
 
 		// Set the hidden input with the selected date
 		$('#hiddenDate').val(selectedDate);
@@ -581,6 +603,7 @@ $(document).ready(function () {
 				// Optionally, you can hide or reset any additional form sections if needed
 				$('#firstForm').show(); // Example: Reset the view to the first form
 				$('#secondForm').hide(); // Example: Hide the second form section
+				$nextButton.prop('disabled', true);
 			},
 			error: function (error) {
 				console.error('Error submitting form:', error);
@@ -629,8 +652,8 @@ $(document).ready(function () {
 			while (commenceTime < FinishTime) {
 				// Format the current time into "HH:mm:ss"
 				const slotTime = `${commenceTime.getHours().toString().padStart(2, '0')}:` +
-                     `${commenceTime.getMinutes().toString().padStart(2, '0')}:` +
-                     `${commenceTime.getSeconds().toString().padStart(2, '0')}`;
+					`${commenceTime.getMinutes().toString().padStart(2, '0')}:` +
+					`${commenceTime.getSeconds().toString().padStart(2, '0')}`;
 				generatedTimeslots.push(slotTime);
 				// Increment the start time by 1 hour
 				commenceTime.setHours(commenceTime.getHours() + 1);
@@ -696,6 +719,34 @@ $(document).ready(function () {
 		$submitButton.prop('disabled', true);
 		$('#end-time-error').remove();  // Remove any existing warning message
 	});
+
+
+	
+
+
+
+	// Function to check the input value
+	function checkInput() {
+		const value = $purposeInput.val();
+		const placeholder = $purposeInput.attr('placeholder');
+
+		if (value.trim() === '' || value === placeholder) {
+			$nextButton.prop('disabled', true);
+			purposeIsStated = false;
+			
+		} else {
+			purposeIsStated=true;
+			if(dateSelectedCustomeDatepicker){
+			$nextButton.prop('disabled', false);
+			}
+		}
+	}
+
+	// Attach event listener to input
+	$purposeInput.on('input', checkInput);
+
+	// Initial check when the page loads
+	checkInput();
 
 });
 

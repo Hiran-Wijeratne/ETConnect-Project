@@ -150,6 +150,12 @@ input[type="submit"]:disabled {
     cursor: not-allowed !important;
     opacity: 0.6 !important;
 }
+input[type="button"]:disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
 
 input[type="submit"].read_bt_submit_button:disabled:hover {
     title: "Please ensure that all fields are filled correctly.";
