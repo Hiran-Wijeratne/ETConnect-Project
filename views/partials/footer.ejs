@@ -109,9 +109,7 @@
 <script>
    document.getElementById("year").innerHTML = new Date().getFullYear();
 </script>
-<!-- Datepicker Javascript -->
-<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
-<!-- <script src="https://unpkg.com/gijgo@1.9.14/js/gijgo.min.js" type="text/javascript"></script>   -->
+
 
 <!-- javascript for the datatable -->
 <script defer src="https://code.jquery.com/jquery-3.7.1.js"></script>
@@ -153,19 +151,8 @@
 </script>
 
 
-<script>
-         $(document).ready(function () {
+<script>new DataTable('table.display');</script>
 
-            $('#example').DataTable({
-               order: [],
-               columnDefs: [
-                  { targets: [0, 3], orderable: false } // Disables sorting for the ID and Description columns
-               ],
-
-               stateSave: true // Save the state of the table (pagination, search, sorting)
-            });
-         });
-</script>
 </body>
 
 </html>

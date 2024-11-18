@@ -452,6 +452,36 @@ $(document).ready(function () {
 	let startTimes = [];
 	let endTimes = [];
 
+	// Initialize DataTables for upcoming bookings
+    $('#upcomingTable').DataTable({
+		order: [],
+		paging: true,
+		searching: true,
+		ordering: true,
+		info: true,
+		columnDefs: [
+		  { orderable: false, targets: [6] } // Disable sorting for the 'Description' column
+		],
+		stateSave: true,
+		responsive: true,  // Ensures the table is responsive
+        autoWidth: false   // Disables automatic column width calculations
+	  });
+  
+	  // Initialize DataTables for past bookings
+	  $('#pastTable').DataTable({
+		order: [],
+		paging: true,
+		searching: true,
+		ordering: true,
+		info: true,
+		columnDefs: [
+		  { orderable: false, targets: [6] } // Disable sorting for the 'Description' column
+		],
+		stateSave: true,
+		responsive: true,  // Ensures the table is responsive
+        autoWidth: false   // Disables automatic column width calculations
+	  });
+
 	// Event listener for the "Next" button
 	$nextButton.on('click', function () {
 		// Get the selected date from the datepicker
@@ -634,14 +664,6 @@ $(document).ready(function () {
 			success: function (response) {
 				// Log success response
 				console.log('Form submitted successfully:', response);
-
-				// // Clear the form fields after successful submission
-				// $('#appointmentForm')[0].reset(); // Resets all form inputs
-
-				// // Optionally, you can hide or reset any additional form sections if needed
-				// $('#firstForm').show(); // Example: Reset the view to the first form
-				// $('#secondForm').hide(); // Example: Hide the second form section
-				// $nextButton.prop('disabled', true);
 				location.reload();
 			},
 			error: function (error) {

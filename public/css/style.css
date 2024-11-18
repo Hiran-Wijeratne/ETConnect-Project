@@ -217,6 +217,16 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
 }
 
 
+
+/* DataTable related styling */
+.table-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto; /* Allow horizontal scrolling if content overflows */
+  }
+  table {
+    width: 100%; /* Ensure table takes up the full width of its container */
+  }
 /* custom css end */
 
 

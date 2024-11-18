@@ -1,3 +1,97 @@
 <%- include("partials/header.ejs") %>
-</div>
-<%- include("partials/footer.ejs") %>
+    </div>
+    <div class="container mt-5">
+        <h1 class="about_taital mt-5">Upcoming Bookings</h1>
+        <table id="upcomingTable" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Username</th>
+                    <th>Meeting Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Description</th>
+                    <th>Attendees</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% upcomingBookings.forEach(booking=> { %>
+                    <tr>
+                        <td>
+                            <%= booking.booking_id %>
+                        </td>
+                        <td>
+                            <%= booking.username %>
+                        </td>
+                        <td>
+                            <%= booking.date %>
+                        </td>
+                        <td>
+                            <%= booking.start_time %>
+                        </td>
+                        <td>
+                            <%= booking.end_time %>
+                        </td>
+                        <td>
+                            <%= booking.description %>
+                        </td>
+                        <td>
+                            <%= booking.attendees %>
+                        </td>
+                        <td>
+                            <%= booking.booking_date %>
+                        </td>
+                    </tr>
+                    <% }); %>
+            </tbody>
+        </table>
+
+        <h1 class="about_taital mt-5">Past Bookings</h1>
+        <table id="pastTable" class="display" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Username</th>
+                    <th>Meeting Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Description</th>
+                    <th>Attendees</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% pastBookings.forEach(booking=> { %>
+                    <tr>
+                        <td>
+                            <%= booking.booking_id %>
+                        </td>
+                        <td>
+                            <%= booking.username %>
+                        </td>
+                        <td>
+                            <%= booking.date %>
+                        </td>
+                        <td>
+                            <%= booking.start_time %>
+                        </td>
+                        <td>
+                            <%= booking.end_time %>
+                        </td>
+                        <td>
+                            <%= booking.description %>
+                        </td>
+                        <td>
+                            <%= booking.attendees %>
+                        </td>
+                        <td>
+                            <%= booking.booking_date %>
+                        </td>
+                    </tr>
+                    <% }); %>
+            </tbody>
+        </table>
+        <div class="mt-5"></div>
+    </div>
+    <%- include("partials/footer.ejs") %>

@@ -7,6 +7,7 @@ import { Strategy } from "passport-local";
 import session from "express-session";
 import env from "dotenv";
 import axios from "axios";
+import moment from "moment";
 
 
 const app = express();
@@ -32,9 +33,9 @@ const formatDate = (date) => {
   return `${day}-${month}-${year}`;
 };
 
-app.get("/", async (req, res) => {
+
+app.use(async (req, res, next) => {
   try {
-    // 1. Get bookings for the next 30 days
     const today = new Date();
     const thirtyDaysLater = new Date(today);
     thirtyDaysLater.setDate(today.getDate() + 30);
@@ -49,10 +50,10 @@ app.get("/", async (req, res) => {
 
     const upcomingBookings = bookingsResult.rows;
 
-    // 2. Initialize an object to track time slots for each day
+    // Initialize an object to track time slots for each day
     const timeSlotsCount = {};
 
-    // 3. Loop through the bookings and get the time slots for each booking
+    // Loop through the bookings and get the time slots for each booking
     for (const booking of upcomingBookings) {
       const bookingId = booking.booking_id;
       const bookingDate = booking.date;
@@ -75,7 +76,7 @@ app.get("/", async (req, res) => {
       timeSlotsCount[formattedDate] += timeSlotsForThisBooking;
     }
 
-    // 4. Filter days with more than 10 time slots
+    // Filter days with more than 10 time slots
     const datesWithTooManyTimeSlots = [];
     for (const date in timeSlotsCount) {
       if (timeSlotsCount[date] > 9) {
@@ -83,17 +84,145 @@ app.get("/", async (req, res) => {
       }
     }
 
-    // 5. Send dates with too many time slots to the front-end
-    res.render("index.ejs", { datesWithTooManyTimeSlots, footerData: datesWithTooManyTimeSlots });
+    // Make data available to all templates
+    res.locals.datesWithTooManyTimeSlots = datesWithTooManyTimeSlots;
+
+    next();
   } catch (err) {
     console.error('Error fetching data:', err);
-    res.status(500).send('Server Error');
+    next(err); // Pass the error to the next middleware
   }
 });
 
-app.get("/bookinglist", (req, res) => {
-  res.render("bookinglist.ejs");
+
+app.get("/", async (req, res) => {
+  res.render("index.ejs");
+  // try {
+  //   // 1. Get bookings for the next 30 days
+  //   const today = new Date();
+  //   const thirtyDaysLater = new Date(today);
+  //   thirtyDaysLater.setDate(today.getDate() + 30);
+
+  //   // Query to get all bookings in the next 30 days
+  //   const bookingsResult = await pool.query(
+  //     `SELECT booking_id, date
+  //      FROM bookings
+  //      WHERE date >= $1 AND date <= $2`,
+  //     [today, thirtyDaysLater]
+  //   );
+
+  //   const upcomingBookings = bookingsResult.rows;
+
+  //   // 2. Initialize an object to track time slots for each day
+  //   const timeSlotsCount = {};
+
+  //   // 3. Loop through the bookings and get the time slots for each booking
+  //   for (const booking of upcomingBookings) {
+  //     const bookingId = booking.booking_id;
+  //     const bookingDate = booking.date;
+
+  //     // Query to get time slots for this booking
+  //     const timeSlotsResult = await pool.query(
+  //       `SELECT timeslot FROM timeslots
+  //        WHERE booking_id = $1`,
+  //       [bookingId]
+  //     );
+
+  //     // Count time slots for this booking and day
+  //     const timeSlotsForThisBooking = timeSlotsResult.rows.length;
+  //     const formattedDate = formatDate(new Date(bookingDate));
+
+  //     if (!timeSlotsCount[formattedDate]) {
+  //       timeSlotsCount[formattedDate] = 0;
+  //     }
+
+  //     timeSlotsCount[formattedDate] += timeSlotsForThisBooking;
+  //   }
+
+  //   // 4. Filter days with more than 10 time slots
+  //   const datesWithTooManyTimeSlots = [];
+  //   for (const date in timeSlotsCount) {
+  //     if (timeSlotsCount[date] > 9) {
+  //       datesWithTooManyTimeSlots.push(date);
+  //     }
+  //   }
+
+  //   // 5. Send dates with too many time slots to the front-end
+  //   res.render("index.ejs", { datesWithTooManyTimeSlots, footerData: datesWithTooManyTimeSlots });
+  // } catch (err) {
+  //   console.error('Error fetching data:', err);
+  //   res.status(500).send('Server Error');
+  // }
 });
+
+
+
+app.get("/bookinglist", async (req, res) => {
+  const currentDate = moment().format("YYYY-MM-DD");
+  const currentTime = moment().format("HH:mm:ss");
+
+  const upcomingQuery = `
+    SELECT 
+      b.booking_id, 
+      u.username, 
+      b.date, 
+      b.start_time, 
+      b.end_time, 
+      b.description, 
+      b.attendees, 
+      DATE(b.created_at) AS booking_date
+    FROM bookings b
+    JOIN users u ON b.user_id = u.user_id
+    WHERE 
+      (b.date > $1) OR 
+      (b.date = $1 AND b.end_time > $2)
+    ORDER BY b.date, b.start_time
+  `;
+
+  const pastQuery = `
+    SELECT 
+      b.booking_id, 
+      u.username, 
+      b.date, 
+      b.start_time, 
+      b.end_time, 
+      b.description, 
+      b.attendees, 
+      DATE(b.created_at) AS booking_date
+    FROM bookings b
+    JOIN users u ON b.user_id = u.user_id
+    WHERE 
+      (b.date < $1) OR 
+      (b.date = $1 AND b.end_time <= $2)
+    ORDER BY b.date DESC, b.start_time DESC
+  `;
+
+  try {
+    const upcomingResult = await pool.query(upcomingQuery, [currentDate, currentTime]);
+    const pastResult = await pool.query(pastQuery, [currentDate, currentTime]);
+
+    const formatBookings = (rows) =>
+      rows.map(row => ({
+        booking_id: row.booking_id,
+        username: row.username,
+        date: moment(row.date).format("DD-MM-YYYY"),
+        start_time: row.start_time,
+        end_time: row.end_time,
+        description: row.description,
+        attendees: row.attendees,
+        booking_date: moment(row.booking_date).format("DD-MM-YYYY"),
+      }));
+
+    const upcomingBookings = formatBookings(upcomingResult.rows);
+    const pastBookings = formatBookings(pastResult.rows);
+
+    res.render("bookinglist.ejs", { upcomingBookings, pastBookings });
+  } catch (err) {
+    console.error("Error retrieving bookings:", err);
+    res.status(500).send("Error retrieving bookings.");
+  }
+});
+
 
 app.get("/mybookings", (req, res) => {
   res.render("mybookings.ejs");
