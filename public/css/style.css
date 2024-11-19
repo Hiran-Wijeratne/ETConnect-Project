@@ -227,6 +227,90 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
   table {
     width: 100%; /* Ensure table takes up the full width of its container */
   }
+
+
+  /* Customizing the .alert */
+  body.login-page {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    background: url('images/banner-bg.png') no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  .container-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .card-login {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+
+  .card-login-body {
+    background: #ffffff;
+    padding: 30px;
+  }
+
+  h1.login-title {
+    text-align: center;
+    color: #0cb7d6;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  .btn-login-primary {
+    background-color: #0cb7d6;
+    border: none;
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+
+  .btn-login-primary:hover {
+    background-color: #0a95b4;
+  }
+
+  .alert-login-danger {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: #b22222;
+    text-align: center;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+  }
+
+  .btn-login-link {
+    color: #0cb7d6;
+    text-decoration: none;
+  }
+
+  .btn-login-link:hover {
+    text-decoration: underline;
+  }
+
+  .btn-login-google {
+    background-color: #ff5252;
+    border: none;
+    width: 100%;
+    color: #fff;
+    font-weight: bold;
+    margin-top: 15px;
+    transition: 0.3s;
+  }
+
+  .btn-login-google:hover {
+    background-color: #e04848;
+  }
+   
 /* custom css end */
 
 

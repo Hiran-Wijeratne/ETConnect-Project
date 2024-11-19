@@ -484,6 +484,7 @@ $(document).ready(function () {
 
 	// Event listener for the "Next" button
 	$nextButton.on('click', function () {
+	
 		// Get the selected date from the datepicker
 		var selectedDate = $datepicker.val();
 
@@ -650,27 +651,27 @@ $(document).ready(function () {
 
 
 	// Event listener for the form submission
-	$('#appointmentForm').on('submit', function (event) {
-		event.preventDefault(); // Prevent default form submission
+	// $('#appointmentForm').on('submit', function (event) {
+	// 	event.preventDefault(); // Prevent default form submission
 
-		// Get form data
-		var formData = $(this).serialize(); // Serialize the form data for submission
+	// 	// Get form data
+	// 	var formData = $(this).serialize(); // Serialize the form data for submission
 
-		// Send form data to backend via AJAX
-		$.ajax({
-			url: '/submit', // Update with your backend submit endpoint
-			type: 'POST',
-			data: formData,
-			success: function (response) {
-				// Log success response
-				console.log('Form submitted successfully:', response);
-				location.reload();
-			},
-			error: function (error) {
-				console.error('Error submitting form:', error);
-			}
-		});
-	});
+	// 	// Send form data to backend via AJAX
+	// 	$.ajax({
+	// 		url: '/submit', // Update with your backend submit endpoint
+	// 		type: 'POST',
+	// 		data: formData,
+	// 		success: function (response) {
+	// 			// Log success response
+	// 			console.log('Form submitted successfully:', response);
+	// 			// location.reload();
+	// 		},
+	// 		error: function (error) {
+	// 			console.error('Error submitting form:', error);
+	// 		}
+	// 	});
+	// });
 
 
 	// Event listener for the "Back" button

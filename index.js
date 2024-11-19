@@ -8,11 +8,28 @@ import session from "express-session";
 import env from "dotenv";
 import axios from "axios";
 import moment from "moment";
+import flash from "connect-flash";
 
 
 const app = express();
 const port = 3000;
+const saltRounds = 10;
 env.config();
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
+    },
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
 const pool = new pg.Pool({
   user: process.env.DB_USER,
@@ -86,6 +103,7 @@ app.use(async (req, res, next) => {
 
     // Make data available to all templates
     res.locals.datesWithTooManyTimeSlots = datesWithTooManyTimeSlots;
+    res.locals.user = req.isAuthenticated() ? req.user : null;
 
     next();
   } catch (err) {
@@ -96,7 +114,7 @@ app.use(async (req, res, next) => {
 
 
 app.get("/", async (req, res) => {
-  res.render("index.ejs");
+  res.render("index.ejs", { messages: req.flash('error') });
   // try {
   //   // 1. Get bookings for the next 30 days
   //   const today = new Date();
@@ -155,6 +173,95 @@ app.get("/", async (req, res) => {
   // }
 });
 
+
+app.get("/login", (req, res) => {
+  res.render("login.ejs", { messages: req.flash('error')});
+});
+
+app.get("/register", (req, res) => {
+  res.render("register.ejs");
+});
+
+app.get("/logout", (req, res) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
+});
+
+app.post("/register", async (req, res) => {
+  const email = req.body.username;
+  const password = req.body.password;
+
+  try {
+    const checkResult = await pool.query("SELECT * FROM users WHERE username = $1", [
+      email,
+    ]);
+
+    if (checkResult.rows.length > 0) {
+      res.render("register.ejs", { errorMessage: "Email already exists. Try logging in." });
+    } else {
+      //hashing the password and saving it in the database
+      bcrypt.hash(password, saltRounds, async (err, hash) => {
+        if (err) {
+          console.error("Error hashing password:", err);
+        } else {
+          console.log("Hashed Password:", hash);
+          await pool.query(
+            "INSERT INTO users (username, password) VALUES ($1, $2)",
+            [email, hash]
+          );
+          res.render("login.ejs");
+        }
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.post("/login", passport.authenticate("local", {
+  successRedirect: '/',  // Redirect to the landing page on success
+  failureRedirect: '/login',  // Redirect to login page on failure
+  failureFlash: true  // Enable flash messages on failure
+})
+);
+
+passport.use(
+  new Strategy(async function verify(username, password, cb) {
+    try {
+      const result = await pool.query("SELECT * FROM users WHERE username = $1 ", [
+        username,
+      ]);
+      if (result.rows.length > 0) {
+        const user = result.rows[0];
+        const storedHashedPassword = user.password;
+        bcrypt.compare(password, storedHashedPassword, (err, valid) => {
+          if (err) {
+            //Error with password check
+            console.error("Error comparing passwords:", err);
+            return cb(err);
+          } else {
+            if (valid) {
+              //Passed password check
+              return cb(null, user);
+            } else {
+              //Did not pass password check
+              return cb(null, false, { message: 'Incorrect username or password.' });
+            }
+          }
+        });
+      } else {
+        return cb(null, false, { message: 'user not found, please sign in first.' });
+      }
+    } catch (err) {
+      console.log(err);
+      return cb(err);
+    }
+  })
+);
 
 
 app.get("/bookinglist", async (req, res) => {
@@ -225,54 +332,59 @@ app.get("/bookinglist", async (req, res) => {
 
 
 app.get("/mybookings", (req, res) => {
-  res.render("mybookings.ejs");
+  if (req.isAuthenticated()) {
+    res.render("mybookings.ejs");
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.post('/next', async (req, res) => {
-  const { date } = req.body;  // selectedDate from frontend
+    const { date } = req.body;  // selectedDate from frontend
 
-  // Reformat date to YYYY-MM-DD format
-  const [day, month, year] = date.split('-');
-  const formattedDate = `${year}-${month}-${day}`;
+    // Reformat date to YYYY-MM-DD format
+    const [day, month, year] = date.split('-');
+    const formattedDate = `${year}-${month}-${day}`;
 
-  try {
-    // Step 1: Query the bookings table to get booking_ids and their respective end_times for the selected date
-    const bookingsResult = await pool.query(
-      `SELECT booking_id, start_time, end_time FROM bookings WHERE date = $1`,
-      [formattedDate]
-    );
+    try {
+      // Step 1: Query the bookings table to get booking_ids and their respective end_times for the selected date
+      const bookingsResult = await pool.query(
+        `SELECT booking_id, start_time, end_time FROM bookings WHERE date = $1`,
+        [formattedDate]
+      );
 
-    // If no bookings found, send an empty response
-    if (bookingsResult.rows.length === 0) {
-      return res.json({ timeslots: [], end_times: [], start_times: [] });
+      // If no bookings found, send an empty response
+      if (bookingsResult.rows.length === 0) {
+        return res.json({ timeslots: [], end_times: [], start_times: [] });
+      }
+
+      // Step 2: Extract booking_ids from the result
+      const bookingIds = bookingsResult.rows.map(row => row.booking_id);
+
+      // Step 3: Query the timeslots table for all timeslots related to those booking_ids
+      const timeslotsResult = await pool.query(
+        `SELECT timeslot, booking_id FROM timeslots WHERE booking_id = ANY($1)`,
+        [bookingIds]
+      );
+
+      // Step 4: Extract timeslots and end_times
+      const timeslots = timeslotsResult.rows.map(row => row.timeslot);
+      const endTimes = bookingsResult.rows.map(row => row.end_time);  // Get end_times from the bookings table
+      const startTimes = bookingsResult.rows.map(row => row.start_time);
+
+
+      // Step 5: Send the timeslot and end_time data to the frontend
+      res.json({ timeslots, end_times: endTimes, start_times: startTimes, booking_ids: bookingIds });
+    } catch (error) {
+      console.error('Error fetching timeslots and end_times:', error);
+      res.status(500).send('Error fetching timeslots and end_times');
     }
-
-    // Step 2: Extract booking_ids from the result
-    const bookingIds = bookingsResult.rows.map(row => row.booking_id);
-
-    // Step 3: Query the timeslots table for all timeslots related to those booking_ids
-    const timeslotsResult = await pool.query(
-      `SELECT timeslot, booking_id FROM timeslots WHERE booking_id = ANY($1)`,
-      [bookingIds]
-    );
-
-    // Step 4: Extract timeslots and end_times
-    const timeslots = timeslotsResult.rows.map(row => row.timeslot);
-    const endTimes = bookingsResult.rows.map(row => row.end_time);  // Get end_times from the bookings table
-    const startTimes = bookingsResult.rows.map(row => row.start_time);
-    
-
-    // Step 5: Send the timeslot and end_time data to the frontend
-    res.json({ timeslots, end_times: endTimes, start_times: startTimes, booking_ids:bookingIds });
-  } catch (error) {
-    console.error('Error fetching timeslots and end_times:', error);
-    res.status(500).send('Error fetching timeslots and end_times');
-  }
 });
 
 
 // Submit route to process and store booking data
 app.post('/submit', async (req, res) => {
+  if (req.isAuthenticated()) {
   let { attendees, date, start, end, purpose } = req.body;
   // Set default values if attendees or purpose are not provided
   attendees = attendees || 2;
@@ -287,7 +399,7 @@ app.post('/submit', async (req, res) => {
     const bookingResult = await pool.query(
       `INSERT INTO bookings (user_id, date, start_time, end_time, description, attendees, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING booking_id`,
-      [1, formattedDate, start, end, purpose, attendees] // Assume user_id = 1 for this example
+      [req.user.user_id, formattedDate, start, end, purpose, attendees] // Assume user_id = 1 for this example
     );
     const bookingId = bookingResult.rows[0].booking_id;
 
@@ -314,10 +426,31 @@ app.post('/submit', async (req, res) => {
       startTime.setHours(startTime.getHours() + 1);
     }
 
-    res.send({ message: 'Form submitted successfully', timeslots, formattedDate });
+    // res.send({ message: 'Form submitted successfully', timeslots, formattedDate });
+    res.redirect('/');
   } catch (error) {
     console.error('Error saving booking:', error);
     res.status(500).send('Error saving booking');
+  }
+} else {
+  res.redirect("/login");
+}
+});
+
+passport.serializeUser((user, cb) => {
+  cb(null, user.user_id); // Serialize user_id to session
+});
+
+passport.deserializeUser(async (id, cb) => {
+  try {
+    const result = await pool.query("SELECT * FROM users WHERE user_id = $1", [id]);
+    if (result.rows.length > 0) {
+      cb(null, result.rows[0]); // Attach the full user object to req.user
+    } else {
+      cb(new Error('User not found'));
+    }
+  } catch (err) {
+    cb(err);
   }
 });
 
