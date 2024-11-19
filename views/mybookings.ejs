@@ -1,3 +1,112 @@
 <%- include("partials/header.ejs") %>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</div>
+<div class="container mt-5">
+    <h1 class="about_taital mt-5">Your Upcoming Bookings</h1>
+    <table id="myUpcomingTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <!-- <th>Username</th> -->
+                <th>Meeting Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <!-- <th>Description</th>
+                <th>Attendees</th> -->
+                <th>Created Date</th>
+                <th>Actions</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <% upcomingMyBookings.forEach(booking=> { %>
+                <tr>
+                    <td>
+                        <%= booking.booking_id %>
+                    </td>
+                   
+                    <td>
+                        <%= booking.date %>
+                    </td>
+                    <td>
+                        <%= booking.start_time %>
+                    </td>
+                    <td>
+                        <%= booking.end_time %>
+                    </td>
+                   
+                    <td>
+                        <%= booking.booking_date %>
+                    </td>
+                    <td>
+                        <!-- Action Buttons -->
+                        <button onclick="viewBooking(1)" title="View">
+                            <span class="material-icons">visibility</span>
+                          </button>
+                          <button onclick="editBooking(1)" title="Edit">
+                            <span class="material-icons">edit</span>
+                          </button>
+                          <button onclick="deleteBooking(1)" title="Delete">
+                            <span class="material-icons">delete</span>
+                          </button>
+                    </td>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+
+    <h1 class="about_taital mt-5">Your Past Bookings</h1>
+    <table id="myPastTable" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <!-- <th>Username</th> -->
+                <th>Meeting Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <!-- <th>Description</th>
+                <th>Attendees</th> -->
+                <th>Created Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% pastMyBookings.forEach(booking=> { %>
+                <tr>
+                    <td>
+                        <%= booking.booking_id %>
+                    </td>
+                    
+                    <td>
+                        <%= booking.date %>
+                    </td>
+                    <td>
+                        <%= booking.start_time %>
+                    </td>
+                    <td>
+                        <%= booking.end_time %>
+                    </td>
+                   
+                    <td>
+                        <%= booking.booking_date %>
+                    </td>
+                    <td>
+                        <!-- Action Buttons -->
+                        <button onclick="viewBooking(1)" title="View">
+                            <span class="material-icons">visibility</span>
+                          </button>
+                          <button onclick="editBooking(1)" title="Edit">
+                            <span class="material-icons">edit</span>
+                          </button>
+                          <button onclick="deleteBooking(1)" title="Delete">
+                            <span class="material-icons">delete</span>
+                          </button>
+                    </td>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+    <div class="mt-5"></div>
 </div>
 <%- include("partials/footer.ejs") %>

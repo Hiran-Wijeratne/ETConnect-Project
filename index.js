@@ -267,6 +267,7 @@ passport.use(
 app.get("/bookinglist", async (req, res) => {
   const currentDate = moment().format("YYYY-MM-DD");
   const currentTime = moment().format("HH:mm:ss");
+  const pastLimitDate = moment().subtract(30, "days").format("YYYY-MM-DD"); // Date 30 days ago
 
   const upcomingQuery = `
     SELECT 
@@ -299,14 +300,16 @@ app.get("/bookinglist", async (req, res) => {
     FROM bookings b
     JOIN users u ON b.user_id = u.user_id
     WHERE 
-      (b.date < $1) OR 
-      (b.date = $1 AND b.end_time <= $2)
+      (
+        (b.date < $1 AND b.date >= $3) OR 
+        (b.date = $1 AND b.end_time <= $2)
+      )
     ORDER BY b.date DESC, b.start_time DESC
   `;
 
   try {
     const upcomingResult = await pool.query(upcomingQuery, [currentDate, currentTime]);
-    const pastResult = await pool.query(pastQuery, [currentDate, currentTime]);
+    const pastResult = await pool.query(pastQuery, [currentDate, currentTime, pastLimitDate]);
 
     const formatBookings = (rows) =>
       rows.map(row => ({
@@ -331,13 +334,82 @@ app.get("/bookinglist", async (req, res) => {
 });
 
 
-app.get("/mybookings", (req, res) => {
+
+app.get("/mybookings", async (req, res) => {
   if (req.isAuthenticated()) {
-    res.render("mybookings.ejs");
+    const currentDate = moment().format("YYYY-MM-DD");
+    const currentTime = moment().format("HH:mm:ss");
+
+    // Retrieve the user_id of the currently logged-in user
+    const userId = req.user.user_id;
+
+    const upcomingQuery = `
+      SELECT 
+        b.booking_id, 
+        u.username, 
+        b.date, 
+        b.start_time, 
+        b.end_time, 
+        b.description, 
+        b.attendees, 
+        DATE(b.created_at) AS booking_date
+      FROM bookings b
+      JOIN users u ON b.user_id = u.user_id
+      WHERE 
+        b.user_id = $1 AND
+        b.date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '90 DAYS'
+      ORDER BY b.date, b.start_time
+    `;
+
+    const pastQuery = `
+      SELECT 
+        b.booking_id, 
+        u.username, 
+        b.date, 
+        b.start_time, 
+        b.end_time, 
+        b.description, 
+        b.attendees, 
+        DATE(b.created_at) AS booking_date
+      FROM bookings b
+      JOIN users u ON b.user_id = u.user_id
+      WHERE 
+        b.user_id = $1 AND
+        b.date BETWEEN CURRENT_DATE - INTERVAL '90 DAYS' AND CURRENT_DATE
+      ORDER BY b.date DESC, b.start_time DESC
+    `;
+
+    try {
+      const upcomingResult = await pool.query(upcomingQuery, [userId]);
+      const pastResult = await pool.query(pastQuery, [userId]);
+
+      const formatBookings = (rows) =>
+        rows.map(row => ({
+          booking_id: row.booking_id,
+          username: row.username,
+          date: moment(row.date).format("DD-MM-YYYY"),
+          start_time: row.start_time,
+          end_time: row.end_time,
+          description: row.description,
+          attendees: row.attendees,
+          booking_date: moment(row.booking_date).format("DD-MM-YYYY"),
+        }));
+
+      const upcomingMyBookings = formatBookings(upcomingResult.rows);
+      const pastMyBookings = formatBookings(pastResult.rows);
+
+      res.render("mybookings.ejs", { upcomingMyBookings, pastMyBookings });
+    } catch (err) {
+      console.error("Error retrieving your bookings:", err);
+      res.status(500).send("Error retrieving your bookings.");
+    }
   } else {
     res.redirect("/login");
   }
 });
+
+
+  
 
 app.post('/next', async (req, res) => {
     const { date } = req.body;  // selectedDate from frontend

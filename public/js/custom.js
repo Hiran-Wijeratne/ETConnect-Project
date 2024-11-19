@@ -460,7 +460,7 @@ $(document).ready(function () {
 		ordering: true,
 		info: true,
 		columnDefs: [
-		  { orderable: false, targets: [6] } // Disable sorting for the 'Description' column
+		  { orderable: false, targets: [5, 6] } // Disable sorting for the 'Description' column
 		],
 		stateSave: true,
 		responsive: true,  // Ensures the table is responsive
@@ -475,12 +475,43 @@ $(document).ready(function () {
 		ordering: true,
 		info: true,
 		columnDefs: [
-		  { orderable: false, targets: [6] } // Disable sorting for the 'Description' column
+		  { orderable: false, targets: [5, 6] } // Disable sorting for the 'Description' column
 		],
 		stateSave: true,
 		responsive: true,  // Ensures the table is responsive
         autoWidth: false   // Disables automatic column width calculations
 	  });
+
+	  // Initialize DataTables for upcoming bookings
+	  $('#myUpcomingTable').DataTable({
+		order: [],
+		paging: true,
+		searching: true,
+		ordering: true,
+		info: true,
+		// columnDefs: [
+		//   { orderable: false, targets: [6] } // Disable sorting for the 'Description' column
+		// ],
+		stateSave: true,
+		responsive: true,  // Ensures the table is responsive
+        autoWidth: false   // Disables automatic column width calculations
+	  });
+  
+	  // Initialize DataTables for past bookings
+	  $('#myPastTable').DataTable({
+		order: [],
+		paging: true,
+		searching: true,
+		ordering: true,
+		info: true,
+		// columnDefs: [
+		//   { orderable: false, targets: [6] } // Disable sorting for the 'Description' column
+		// ],
+		stateSave: true,
+		responsive: true,  // Ensures the table is responsive
+        autoWidth: false   // Disables automatic column width calculations
+	  });
+
 
 	// Event listener for the "Next" button
 	$nextButton.on('click', function () {
