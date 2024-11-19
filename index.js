@@ -9,12 +9,15 @@ import env from "dotenv";
 import axios from "axios";
 import moment from "moment";
 import flash from "connect-flash";
+import GoogleStrategy from "passport-google-oauth2";
 
 
 const app = express();
 const port = 3000;
 const saltRounds = 10;
 env.config();
+
+
 
 app.use(
   session({
@@ -49,6 +52,7 @@ const formatDate = (date) => {
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 };
+
 
 
 app.use(async (req, res, next) => {
@@ -115,62 +119,6 @@ app.use(async (req, res, next) => {
 
 app.get("/", async (req, res) => {
   res.render("index.ejs", { messages: req.flash('error') });
-  // try {
-  //   // 1. Get bookings for the next 30 days
-  //   const today = new Date();
-  //   const thirtyDaysLater = new Date(today);
-  //   thirtyDaysLater.setDate(today.getDate() + 30);
-
-  //   // Query to get all bookings in the next 30 days
-  //   const bookingsResult = await pool.query(
-  //     `SELECT booking_id, date
-  //      FROM bookings
-  //      WHERE date >= $1 AND date <= $2`,
-  //     [today, thirtyDaysLater]
-  //   );
-
-  //   const upcomingBookings = bookingsResult.rows;
-
-  //   // 2. Initialize an object to track time slots for each day
-  //   const timeSlotsCount = {};
-
-  //   // 3. Loop through the bookings and get the time slots for each booking
-  //   for (const booking of upcomingBookings) {
-  //     const bookingId = booking.booking_id;
-  //     const bookingDate = booking.date;
-
-  //     // Query to get time slots for this booking
-  //     const timeSlotsResult = await pool.query(
-  //       `SELECT timeslot FROM timeslots
-  //        WHERE booking_id = $1`,
-  //       [bookingId]
-  //     );
-
-  //     // Count time slots for this booking and day
-  //     const timeSlotsForThisBooking = timeSlotsResult.rows.length;
-  //     const formattedDate = formatDate(new Date(bookingDate));
-
-  //     if (!timeSlotsCount[formattedDate]) {
-  //       timeSlotsCount[formattedDate] = 0;
-  //     }
-
-  //     timeSlotsCount[formattedDate] += timeSlotsForThisBooking;
-  //   }
-
-  //   // 4. Filter days with more than 10 time slots
-  //   const datesWithTooManyTimeSlots = [];
-  //   for (const date in timeSlotsCount) {
-  //     if (timeSlotsCount[date] > 9) {
-  //       datesWithTooManyTimeSlots.push(date);
-  //     }
-  //   }
-
-  //   // 5. Send dates with too many time slots to the front-end
-  //   res.render("index.ejs", { datesWithTooManyTimeSlots, footerData: datesWithTooManyTimeSlots });
-  // } catch (err) {
-  //   console.error('Error fetching data:', err);
-  //   res.status(500).send('Server Error');
-  // }
 });
 
 
@@ -190,6 +138,19 @@ app.get("/logout", (req, res) => {
     res.redirect("/");
   });
 });
+
+app.get("/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })
+);
+
+app.get("/auth/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "/",
+    failureRedirect: "/login",
+  })
+);
 
 app.post("/register", async (req, res) => {
   const email = req.body.username;
@@ -229,7 +190,7 @@ app.post("/login", passport.authenticate("local", {
 })
 );
 
-passport.use(
+passport.use("local",
   new Strategy(async function verify(username, password, cb) {
     try {
       const result = await pool.query("SELECT * FROM users WHERE username = $1 ", [
@@ -263,6 +224,36 @@ passport.use(
   })
 );
 
+passport.use("google",
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/auth/google/callback",
+      userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+    },
+    async (accessToken, refreshToken, profile, cb) => {
+      try {
+        console.log(profile);
+        const email = profile.emails[0].value;
+        const result = await pool.query("SELECT * FROM users WHERE username = $1", [
+          email,
+        ]);
+        if (result.rows.length === 0) {
+          const newUser = await pool.query(
+            "INSERT INTO users (username, password) VALUES ($1, $2)",
+            [email, "google"]
+          );
+          return cb(null, newUser.rows[0]);
+        } else {
+          return cb(null, result.rows[0]);
+        }
+      } catch (err) {
+        return cb(err);
+      }
+    }
+  )
+);
 
 app.get("/bookinglist", async (req, res) => {
   const currentDate = moment().format("YYYY-MM-DD");
@@ -332,7 +323,6 @@ app.get("/bookinglist", async (req, res) => {
     res.status(500).send("Error retrieving bookings.");
   }
 });
-
 
 
 app.get("/mybookings", async (req, res) => {
@@ -408,8 +398,6 @@ app.get("/mybookings", async (req, res) => {
   }
 });
 
-
-  
 
 app.post('/next', async (req, res) => {
     const { date } = req.body;  // selectedDate from frontend
@@ -499,7 +487,17 @@ app.post('/submit', async (req, res) => {
     }
 
     // res.send({ message: 'Form submitted successfully', timeslots, formattedDate });
-    res.redirect('/');
+    // res.redirect('/');
+    res.render('confirmation.ejs', {
+      booking: {
+        id: bookingId,
+        date: `${day}-${month}-${year}`, // Reformat for display
+        startTime: start,
+        endTime: end,
+        attendees,
+        purpose,
+      },
+    });
   } catch (error) {
     console.error('Error saving booking:', error);
     res.status(500).send('Error saving booking');
@@ -507,6 +505,10 @@ app.post('/submit', async (req, res) => {
 } else {
   res.redirect("/login");
 }
+});
+
+app.get("/confirmation", async (req, res) => {
+  res.render("confirmation.ejs");
 });
 
 passport.serializeUser((user, cb) => {
