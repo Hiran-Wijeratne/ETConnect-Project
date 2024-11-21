@@ -97,7 +97,10 @@
     text-transform: uppercase;
     border-color: white;
 }
-
+.read_bt_next_button:hover{
+    color: #252525;
+    background-color: #ffffff;
+}
 .read_bt_submit_button:hover{
     color: #252525;
     background-color: #ffffff;
@@ -310,6 +313,18 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
   .btn-login-google:hover {
     background-color: #e04848;
   }
+
+  #calendar {
+    margin: 20px auto;
+    width: 100%;
+}
+
+.fc-event-title {
+    font-size: 12px; /* Adjust event title font size */
+}
+.fc-event-time {
+    font-size: 10px; /* Adjust event time font size */
+}
    
 /* custom css end */
 
@@ -760,7 +775,7 @@ button {
 }
 
 .read_bt a:hover {
-    color: #252525;
+    color: #252525 !important;
     background-color: #ffffff;
 }
 

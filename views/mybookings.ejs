@@ -2,7 +2,7 @@
 
 </div>
 <div class="container mt-5">
-    <h1 class="about_taital mt-5">Your Upcoming Bookings</h1>
+    <h1 class="about_taital mt-5">My Upcoming Bookings</h1>
     <table id="myUpcomingTable" class="display" style="width:100%">
         <thead>
             <tr>
@@ -54,8 +54,9 @@
                 <% }); %>
         </tbody>
     </table>
-
-    <h1 class="about_taital mt-5">Your Past Bookings</h1>
+    <div class="about_bt my-5"><a id="toggleMyPastBookings" style="color: white;">My Past Bookings</a></div>
+    <div id="pastMyBookingsSection" class="mt-5" style="display: none;">
+    <h1 class="about_taital mt-5">My Past Bookings</h1>
     <table id="myPastTable" class="display" style="width:100%">
         <thead>
             <tr>
@@ -106,6 +107,6 @@
                 <% }); %>
         </tbody>
     </table>
-    <div class="mt-5"></div>
+</div>
 </div>
 <%- include("partials/footer.ejs") %>

@@ -1,7 +1,19 @@
 <%- include("partials/header.ejs") %>
+</div>
+
+<div class="container mt-5">
+    <div class="about_bt my-5">
+        <a  id="calendarView" style="color: white;">Calendar View</a>
     </div>
-    <div class="container mt-5">
-        <h1 class="about_taital mt-5">Upcoming Bookings</h1>
+
+    <h1 class="about_taital mt-5">Upcoming Bookings</h1>
+    <div id="calendarContainer"> 
+        <div id='calendar'></div>
+    </div>
+   
+
+    <!-- Booking Table -->
+    <div id="bookingsTableContainer">
         <table id="upcomingTable" class="display" style="width:100%">
             <thead>
                 <tr>
@@ -16,37 +28,28 @@
                 </tr>
             </thead>
             <tbody>
-                <% upcomingBookings.forEach(booking=> { %>
+
+                <% upcomingBookings.forEach(booking => { %>
                     <tr>
-                        <td>
-                            <%= booking.booking_id %>
-                        </td>
-                        <td>
-                            <%= booking.username %>
-                        </td>
-                        <td>
-                            <%= booking.date %>
-                        </td>
-                        <td>
-                            <%= booking.start_time %>
-                        </td>
-                        <td>
-                            <%= booking.end_time %>
-                        </td>
-                        <td>
-                            <%= booking.description %>
-                        </td>
-                        <td>
-                            <%= booking.attendees %>
-                        </td>
-                        <td>
-                            <%= booking.booking_date %>
-                        </td>
+                        <td><%= booking.booking_id %></td>
+                        <td><%= booking.username %></td>
+                        <td><%= booking.date %></td>
+                        <td><%= booking.start_time %></td>
+                        <td><%= booking.end_time %></td>
+                        <td><%= booking.description %></td>
+                        <td><%= booking.attendees %></td>
+                        <td><%= booking.booking_date %></td>
                     </tr>
-                    <% }); %>
+                <% }); %>
             </tbody>
         </table>
+ 
 
+    <!-- Toggle past bookings -->
+    <div class="about_bt my-5">
+        <a id="togglePastBookings" style="color: white;">Past Bookings</a>
+    </div>
+    <div id="pastBookingsSection" class="mt-5" style="display: none;">
         <h1 class="about_taital mt-5">Past Bookings</h1>
         <table id="pastTable" class="display" style="width:100%">
             <thead>
@@ -62,36 +65,28 @@
                 </tr>
             </thead>
             <tbody>
-                <% pastBookings.forEach(booking=> { %>
+                <% pastBookings.forEach(booking => { %>
                     <tr>
-                        <td>
-                            <%= booking.booking_id %>
-                        </td>
-                        <td>
-                            <%= booking.username %>
-                        </td>
-                        <td>
-                            <%= booking.date %>
-                        </td>
-                        <td>
-                            <%= booking.start_time %>
-                        </td>
-                        <td>
-                            <%= booking.end_time %>
-                        </td>
-                        <td>
-                            <%= booking.description %>
-                        </td>
-                        <td>
-                            <%= booking.attendees %>
-                        </td>
-                        <td>
-                            <%= booking.booking_date %>
-                        </td>
+                        <td><%= booking.booking_id %></td>
+                        <td><%= booking.username %></td>
+                        <td><%= booking.date %></td>
+                        <td><%= booking.start_time %></td>
+                        <td><%= booking.end_time %></td>
+                        <td><%= booking.description %></td>
+                        <td><%= booking.attendees %></td>
+                        <td><%= booking.booking_date %></td>
                     </tr>
-                    <% }); %>
+                <% }); %>
             </tbody>
         </table>
-        <div class="mt-5"></div>
     </div>
-    <%- include("partials/footer.ejs") %>
+</div>
+</div>
+
+
+<script>
+    // Serialize the upcoming bookings as JSON
+    const upcomingBookings = <%- JSON.stringify(upcomingBookings) %>;
+</script>
+
+<%- include("partials/footer.ejs") %>
