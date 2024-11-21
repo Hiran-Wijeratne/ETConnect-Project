@@ -470,82 +470,141 @@ let calendarInstance;
 
 
 // $('#calendarView').click(function() {
-//     $('#calendar').toggle();
-// 	$('#calendarContainer').toggle();
-//     // $('#bookingsTableContainer').toggle();
+//     $('#calendarContainer').toggle();
+//     $('#bookingsTableContainer').toggle();
 
-//     // If the calendar is already initialized, just show it
+//     // Define a fake booking for testing
+//     const fakeBookings = [
+//         {
+//             date: "2024-11-25", // Use a valid date
+//             start_time: "09:00:00", // Valid start time
+//             end_time: "11:00:00", // Valid end time
+//             username: "Test User",
+//             description: "Test Event Description",
+//             attendees: ["Attendee 1", "Attendee 2"]
+//         },
+// 		{
+//             date: "2024-11-25", // Use a valid date
+//             start_time: "11:00:00", // Valid start time
+//             end_time: "12:00:00", // Valid end time
+//             username: "Test User 2",
+//             description: "Test Event Description",
+//             attendees: ["Attendee 1", "Attendee 2"]
+//         },
+// 		{
+//             date: "2024-11-25", // Use a valid date
+//             start_time: "12:00:00", // Valid start time
+//             end_time: "01:00:00", // Valid end time
+//             username: "Test User 3",
+//             description: "Test Event Description",
+//             attendees: ["Attendee 1", "Attendee 2"]
+//         },
+// 		{
+//             date: "2024-11-25", // Use a valid date
+//             start_time: "09:00:00", // Valid start time
+//             end_time: "11:00:00", // Valid end time
+//             username: "Test User",
+//             description: "Test Event Description",
+//             attendees: ["Attendee 1", "Attendee 2"]
+//         }
+//     ];
+
+//     // Log the fake booking to verify it
+//     console.log("Using fakeBookings data:", fakeBookings);
+
 //     if (!calendarInstance) {
 //         const calendarEl = document.getElementById('calendar');
+
+//         // Map the fakeBookings to FullCalendar event objects
+//         const calendarEvents = fakeBookings.map(booking => {
+//             const startDate = new Date(`${booking.date}T${booking.start_time}`);
+//             const endDate = new Date(`${booking.date}T${booking.end_time}`);
+
+//             const event = {
+//                 title: booking.username,
+//                 start: startDate,
+//                 end: endDate,
+//                 description: booking.description,
+//                 attendees: booking.attendees
+//             };
+
+//             // Log each event to debug
+//             console.log("Mapped Event (fake):", event);
+
+//             return event;
+//         });
+
+//         // Log the final events array
+//         console.log("Final Events Array (fake):", calendarEvents);
+
 //         calendarInstance = new FullCalendar.Calendar(calendarEl, {
 //             initialView: 'dayGridMonth',
-//             events: upcomingBookings.map(booking => {
-//                 // Convert the start and end time to a Date object
-//                 const startDate = new Date(`${booking.date}T${booking.start_time}`);
-//                 const endDate = new Date(`${booking.date}T${booking.end_time}`);
-
-//                 return {
-//                     title: booking.username,  // The event title can be the username
-//                     start: startDate,  // Start time
-//                     end: endDate,  // End time
-//                     description: booking.description,
-//                     attendees: booking.attendees
-//                 };
-//             }),
+//             events: calendarEvents, // Use fake events
 //             headerToolbar: {
 //                 left: 'prev,next today',
 //                 center: 'title',
 //                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
 //             },
 //             eventContent: function(info) {
-//                 const startTime = info.event.start.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-//                 const endTime = info.event.end ? info.event.end.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : 'N/A';
+//                 const startTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+//                 const endTime = info.event.end ? info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
 //                 const personName = info.event.title || 'Unknown';
-                
+
 //                 const content = document.createElement('div');
 //                 content.innerHTML = `<strong>${personName}</strong><br>${startTime} - ${endTime}`;
 //                 return { domNodes: [content] };
 //             }
 //         });
+
 //         calendarInstance.render();
-//     } else {
-//         // If the calendar is already initialized, just toggle its visibility
-//         $('#calendarContainer').toggle();
-//         // $('#bookingsTableContainer').toggle();
 //     }
 // });
+
 	
-$('#calendarView').click(function() {
+$('#calendarView').click(function () {
     $('#calendarContainer').toggle();
     $('#bookingsTableContainer').toggle();
+
+    // Preprocess the upcomingBookings data to correct the date format
+    const calendarEvents = upcomingBookings.map(booking => {
+        // Convert 'DD-MM-YYYY' to 'YYYY-MM-DD'
+        const [day, month, year] = booking.date.split('-'); // Split the date by '-'
+        const formattedDate = `${year}-${month}-${day}`; // Rearrange to 'YYYY-MM-DD'
+
+        // Construct the start and end dates
+        const startDate = new Date(`${formattedDate}T${booking.start_time}`);
+        const endDate = new Date(`${formattedDate}T${booking.end_time}`);
+
+        // Create the event object
+        const event = {
+            title: booking.username,
+            start: startDate,
+            end: endDate,
+            description: booking.description,
+            attendees: booking.attendees
+        };
+
+        console.log("Mapped Event:", event); // Log each event for debugging
+
+        return event;
+    });
 
     // If the calendar is already initialized, just show it
     if (!calendarInstance) {
         const calendarEl = document.getElementById('calendar');
         calendarInstance = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            events: upcomingBookings.map(booking => {
-                const startDate = new Date(`${booking.date}T${booking.start_time}`);
-                const endDate = new Date(`${booking.date}T${booking.end_time}`);
-
-                return {
-                    title: booking.username,
-                    start: startDate,
-                    end: endDate,
-                    description: booking.description,
-                    attendees: booking.attendees
-                };
-            }),
+            events: calendarEvents, // Use the processed events
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
-            eventContent: function(info) {
-                const startTime = info.event.start.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-                const endTime = info.event.end ? info.event.end.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : 'N/A';
+            eventContent: function (info) {
+                const startTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const endTime = info.event.end ? info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
                 const personName = info.event.title || 'Unknown';
-                
+
                 const content = document.createElement('div');
                 content.innerHTML = `<strong>${personName}</strong><br>${startTime} - ${endTime}`;
                 return { domNodes: [content] };
@@ -554,6 +613,8 @@ $('#calendarView').click(function() {
         calendarInstance.render();
     }
 });
+
+
 
 
 
