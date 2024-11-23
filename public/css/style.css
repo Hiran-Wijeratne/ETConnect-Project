@@ -325,6 +325,10 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
 .fc-event-time {
     font-size: 10px; /* Adjust event time font size */
 }
+
+#pastMyBookingsSection {
+    overflow-x: auto;
+}
    
 /* custom css end */
 

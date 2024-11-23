@@ -398,9 +398,6 @@ app.get("/mybookings", async (req, res) => {
   }
 });
 
-app.get("/calendar-view", (req, res) => {
-  res.render("calendar.ejs");
-});
 
 app.post('/next', async (req, res) => {
     const { date } = req.body;  // selectedDate from frontend

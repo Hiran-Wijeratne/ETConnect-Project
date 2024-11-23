@@ -400,68 +400,14 @@ $(function () {
 
 
 
-
-
-
-
-var dateSelectedCustomeDatepicker = false;
-var purposeIsStated = false;
-
-// custom js
-function onDateChange($datepickerElement) {
-	const selectedDate = $datepickerElement.val().trim();
-	const $nextButton = $('#nextButton'); // Adjust to your specific button selector
-
-	if (selectedDate !== '') {
-		console.log("datepicker is selected");
-		dateSelectedCustomeDatepicker = true;
-		if (purposeIsStated) {
-			$nextButton.prop('disabled', false); // Enable the button
-		}
-	} else {
-		dateSelectedCustomeDatepicker = false;
-		$nextButton.prop('disabled', true); // Disable the button
-		console.log("datepicker is selected");
-	}
-}
-
-
-
-
-
 $(document).ready(function () {
 
-	const $startTime = $('select[name="start"]');
-	const $endTime = $('select[name="end"]');
-	const $submitButton = $('input[type="submit"]');
-	const $backButton = $('#backButton');
-	const $firstForm = $('#firstForm');
-	const $secondForm = $('#secondForm');
-	const $nextButton = $('#nextButton');
-	const $purposeInput = $('input[name="purpose"]');
-	const $datepicker = $('#datepicker');
-
-	var noConflictingBookings = false;
-
-	// Disable the submit and next buttons initially
-	$submitButton.prop('disabled', true);
-	$nextButton.prop('disabled', true);
-
-
-	var timeslots = [];
-	let startTimes = [];
-	let endTimes = [];
-
-	$('#calendarContainer').hide();
+$('#calendarContainer').hide();
 
     // When the "Calendar View" button is clicked
 // Assuming upcomingBookings is already available from EJS as a JavaScript object
 
 console.log(upcomingBookings); // To check how the data looks in the JS file
-
-$('#calendarContainer').hide();
-// $('#calendar').hide();
-// $('#bookingsTableContainer').show();
 
 
 // When the "Calendar View" button is clicked
@@ -469,98 +415,7 @@ $('#calendarContainer').hide();
 let calendarInstance;
 
 
-// $('#calendarView').click(function() {
-//     $('#calendarContainer').toggle();
-//     $('#bookingsTableContainer').toggle();
-
-//     // Define a fake booking for testing
-//     const fakeBookings = [
-//         {
-//             date: "2024-11-25", // Use a valid date
-//             start_time: "09:00:00", // Valid start time
-//             end_time: "11:00:00", // Valid end time
-//             username: "Test User",
-//             description: "Test Event Description",
-//             attendees: ["Attendee 1", "Attendee 2"]
-//         },
-// 		{
-//             date: "2024-11-25", // Use a valid date
-//             start_time: "11:00:00", // Valid start time
-//             end_time: "12:00:00", // Valid end time
-//             username: "Test User 2",
-//             description: "Test Event Description",
-//             attendees: ["Attendee 1", "Attendee 2"]
-//         },
-// 		{
-//             date: "2024-11-25", // Use a valid date
-//             start_time: "12:00:00", // Valid start time
-//             end_time: "01:00:00", // Valid end time
-//             username: "Test User 3",
-//             description: "Test Event Description",
-//             attendees: ["Attendee 1", "Attendee 2"]
-//         },
-// 		{
-//             date: "2024-11-25", // Use a valid date
-//             start_time: "09:00:00", // Valid start time
-//             end_time: "11:00:00", // Valid end time
-//             username: "Test User",
-//             description: "Test Event Description",
-//             attendees: ["Attendee 1", "Attendee 2"]
-//         }
-//     ];
-
-//     // Log the fake booking to verify it
-//     console.log("Using fakeBookings data:", fakeBookings);
-
-//     if (!calendarInstance) {
-//         const calendarEl = document.getElementById('calendar');
-
-//         // Map the fakeBookings to FullCalendar event objects
-//         const calendarEvents = fakeBookings.map(booking => {
-//             const startDate = new Date(`${booking.date}T${booking.start_time}`);
-//             const endDate = new Date(`${booking.date}T${booking.end_time}`);
-
-//             const event = {
-//                 title: booking.username,
-//                 start: startDate,
-//                 end: endDate,
-//                 description: booking.description,
-//                 attendees: booking.attendees
-//             };
-
-//             // Log each event to debug
-//             console.log("Mapped Event (fake):", event);
-
-//             return event;
-//         });
-
-//         // Log the final events array
-//         console.log("Final Events Array (fake):", calendarEvents);
-
-//         calendarInstance = new FullCalendar.Calendar(calendarEl, {
-//             initialView: 'dayGridMonth',
-//             events: calendarEvents, // Use fake events
-//             headerToolbar: {
-//                 left: 'prev,next today',
-//                 center: 'title',
-//                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
-//             },
-//             eventContent: function(info) {
-//                 const startTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-//                 const endTime = info.event.end ? info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-//                 const personName = info.event.title || 'Unknown';
-
-//                 const content = document.createElement('div');
-//                 content.innerHTML = `<strong>${personName}</strong><br>${startTime} - ${endTime}`;
-//                 return { domNodes: [content] };
-//             }
-//         });
-
-//         calendarInstance.render();
-//     }
-// });
-
-	
+    
 $('#calendarView').click(function () {
     $('#calendarContainer').toggle();
     $('#bookingsTableContainer').toggle();
@@ -614,6 +469,7 @@ $('#calendarView').click(function () {
     }
 });
 
+});
 
 
 
@@ -625,24 +481,93 @@ $('#calendarView').click(function () {
 
 
 
+$('#scrollButton').on('click', function () {
+	$('html, body').animate({
+	  scrollTop: $('.scroll-marker').offset().top
+	}, 'slow'); // Adjust speed ('slow', 'fast', or a number in milliseconds)
+  });
+
+	$('#togglePastBookings').on('click', function () {
+		$('#pastBookingsSection').toggle();
+	
+		// Adjust the table after it becomes visible
+		if ($('#pastBookingsSection').is(':visible')) {
+			var table = $('#pastTable').DataTable();
+			table.columns.adjust().draw(); // Recalculate column widths
+		}
+	});
+	
+
+	$('#toggleMyPastBookings').on('click', function () {
+		$('#pastMyBookingsSection').toggle();
+	
+		// Adjust the table after it becomes visible
+		if ($('#pastMyBookingsSection').is(':visible')) {
+			var table = $('#myPastTable').DataTable();
+			table.columns.adjust().draw(); // Recalculate column widths
+		}
+	});
+	
+
+
+
+
+
+
+
+
+
+
+var dateSelectedCustomeDatepicker = false;
+var purposeIsStated = false;
+
+// custom js
+function onDateChange($datepickerElement) {
+	const selectedDate = $datepickerElement.val().trim();
+	const $nextButton = $('#nextButton'); // Adjust to your specific button selector
+
+	if (selectedDate !== '') {
+		console.log("datepicker is selected");
+		dateSelectedCustomeDatepicker = true;
+		if (purposeIsStated) {
+			$nextButton.prop('disabled', false); // Enable the button
+		}
+	} else {
+		dateSelectedCustomeDatepicker = false;
+		$nextButton.prop('disabled', true); // Disable the button
+		console.log("datepicker is selected");
+	}
+}
+
+
+
+
+
+$(document).ready(function () {
+
+	const $startTime = $('select[name="start"]');
+	const $endTime = $('select[name="end"]');
+	const $submitButton = $('input[type="submit"]');
+	const $backButton = $('#backButton');
+	const $firstForm = $('#firstForm');
+	const $secondForm = $('#secondForm');
+	const $nextButton = $('#nextButton');
+	const $purposeInput = $('input[name="purpose"]');
+	const $datepicker = $('#datepicker');
+
+	var noConflictingBookings = false;
+
+	// Disable the submit and next buttons initially
+	$submitButton.prop('disabled', true);
+	$nextButton.prop('disabled', true);
+
+
+	var timeslots = [];
+	let startTimes = [];
+	let endTimes = [];
 
 	
-	$('#scrollButton').on('click', function () {
-		$('html, body').animate({
-		  scrollTop: $('.scroll-marker').offset().top
-		}, 'slow'); // Adjust speed ('slow', 'fast', or a number in milliseconds)
-	  });
 
-	$(document).ready(function() {
-        $('#togglePastBookings').on('click', function() {
-            $('#pastBookingsSection').toggle();  // Toggles visibility
-        });
-    });
-	$(document).ready(function() {
-        $('#toggleMyPastBookings').on('click', function() {
-            $('#pastMyBookingsSection').toggle();  // Toggles visibility
-        });
-    });
 
 	// Initialize DataTables for upcoming bookings
     $('#upcomingTable').DataTable({
@@ -656,7 +581,7 @@ $('#calendarView').click(function () {
 		],
 		stateSave: true,
 		responsive: true,  // Ensures the table is responsive
-        autoWidth: false,   // Disables automatic column width calculations
+        autoWidth: true,   // Disables automatic column width calculations
 		scrollX: true
 	  });
   
@@ -667,12 +592,9 @@ $('#calendarView').click(function () {
 		searching: true,
 		ordering: true,
 		info: true,
-		columnDefs: [
-		  { orderable: false, targets: [5, 6] } // Disable sorting for the 'Description' column
-		],
 		stateSave: true,
 		responsive: true,  // Ensures the table is responsive
-        autoWidth: false,   // Disables automatic column width calculations
+        autoWidth: true,   // Disables automatic column width calculations
 		scrollX: true
 	  });
 
@@ -688,7 +610,7 @@ $('#calendarView').click(function () {
 		// ],
 		stateSave: true,
 		responsive: true,  // Ensures the table is responsive
-        autoWidth: false,   // Disables automatic column width calculations
+        autoWidth: true,   // Disables automatic column width calculations
 		scrollX: true
 	  });
   
@@ -699,15 +621,14 @@ $('#calendarView').click(function () {
 		searching: true,
 		ordering: true,
 		info: true,
-		// columnDefs: [
-		//   { orderable: false, targets: [6] } // Disable sorting for the 'Description' column
-		// ],
 		stateSave: true,
-		responsive: true,  // Ensures the table is responsive
-        autoWidth: false,   // Disables automatic column width calculations
-		scrollX: true
-	  });
-
+		responsive: true,  // Enables responsive behavior
+		autoWidth: true,  // Set to false to let DataTables calculate width dynamically
+		scrollX: true,     // Enables horizontal scrolling
+		columnDefs: [
+			{ targets: '_all', width: 'auto' } // Ensures all columns adjust to content
+		]
+	});
 
 	// Event listener for the "Next" button
 	$nextButton.on('click', function () {
