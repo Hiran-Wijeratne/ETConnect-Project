@@ -2,6 +2,35 @@
 
 </div>
 <div class="container mt-5">
+
+    <div id="editModal" class="modal" style="display: none;">
+        <div class="modal-content">
+          <span id="closeModal" class="close-button">&times;</span>
+          <h2>Edit Booking</h2>
+          <form id="editForm">
+            <input type="hidden" name="booking_id" id="editBookingId">
+            <div>
+              <label for="editDate">Meeting Date:</label>
+              <input type="date" id="editDate" name="date" required>
+            </div>
+            <div>
+              <label for="editStartTime">Start Time:</label>
+              <input type="time" id="editStartTime" name="start_time" required>
+            </div>
+            <div>
+              <label for="editEndTime">End Time:</label>
+              <input type="time" id="editEndTime" name="end_time" required>
+            </div>
+            <button type="submit">Save Changes</button>
+          </form>
+        </div>
+      </div>
+      <div id="overlay" style="display: none;"></div>
+      
+
+
+
+
     <h1 class="about_taital mt-5">My Upcoming Bookings</h1>
     <table id="myUpcomingTable" class="display" style="width:100%">
         <thead>
@@ -43,10 +72,10 @@
                         <button onclick="viewBooking(1)" title="View">
                             <span class="material-icons">visibility</span>
                           </button>
-                          <button onclick="editBooking(1)" title="Edit">
+                          <button onclick="window.location.href='/edit-booking/<%= booking.booking_id %>'" title="Edit">
                             <span class="material-icons">edit</span>
                           </button>
-                          <button onclick="deleteBooking(1)" title="Delete">
+                         <button onclick="deleteBooking(1)" title="Delete">
                             <span class="material-icons">delete</span>
                           </button>
                     </td>
@@ -61,14 +90,10 @@
         <thead>
             <tr>
                 <th>Booking ID</th>
-                <!-- <th>Username</th> -->
                 <th>Meeting Date</th>
                 <th>Start Time</th>
                 <th>End Time</th>
-                <!-- <th>Description</th>
-                <th>Attendees</th> -->
                 <th>Created Date</th>
-                <!-- <th>Actions</th> -->
             </tr>
         </thead>
         <tbody>
@@ -91,21 +116,11 @@
                     <td>
                         <%= booking.booking_date %>
                     </td>
-                    <!-- <td>
-                        <button onclick="viewBooking(1)" title="View">
-                            <span class="material-icons">visibility</span>
-                          </button>
-                          <button onclick="editBooking(1)" title="Edit">
-                            <span class="material-icons">edit</span>
-                          </button>
-                          <button onclick="deleteBooking(1)" title="Delete">
-                            <span class="material-icons">delete</span>
-                          </button>
-                    </td> -->
                 </tr>
                 <% }); %>
         </tbody>
     </table>
     </div>
 </div>
+
 <%- include("partials/footer.ejs") %>

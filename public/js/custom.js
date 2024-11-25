@@ -400,22 +400,52 @@ $(function () {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $(document).ready(function () {
 
 $('#calendarContainer').hide();
-
-    // When the "Calendar View" button is clicked
-// Assuming upcomingBookings is already available from EJS as a JavaScript object
-
-console.log(upcomingBookings); // To check how the data looks in the JS file
-
-
-// When the "Calendar View" button is clicked
-// Store the calendar instance globally to prevent re-initialization
+console.log(upcomingBookings);
 let calendarInstance;
-
-
-    
 $('#calendarView').click(function () {
     $('#calendarContainer').toggle();
     $('#bookingsTableContainer').toggle();
@@ -468,14 +498,7 @@ $('#calendarView').click(function () {
         calendarInstance.render();
     }
 });
-
 });
-
-
-
-
-
-
 
 
 
@@ -554,12 +577,15 @@ $(document).ready(function () {
 	const $nextButton = $('#nextButton');
 	const $purposeInput = $('input[name="purpose"]');
 	const $datepicker = $('#datepicker');
+	const isHomePage = $('#homePage').length > 0;
 
 	var noConflictingBookings = false;
 
 	// Disable the submit and next buttons initially
 	$submitButton.prop('disabled', true);
+	if (isHomePage) {
 	$nextButton.prop('disabled', true);
+	}
 
 
 	var timeslots = [];
@@ -926,8 +952,14 @@ $(document).ready(function () {
 		}
 	}
 
+	
+
 	// Attach event listener to input
 	$purposeInput.on('input', checkInput);
+	$('button[title="Edit"]').on('click', function (event) {
+		$nextButton.prop('disabled', false);
+		
+	 });
 
 	// Initial check when the page loads
 	checkInput();

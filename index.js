@@ -398,6 +398,33 @@ app.get("/mybookings", async (req, res) => {
   }
 });
 
+app.get('/edit-booking/:id', async (req, res) => {
+  if (req.isAuthenticated()) {
+  const booking_id = req.params.id;
+
+  try {
+    // Query only the specific booking by booking_id
+    const result = await pool.query('SELECT * FROM bookings WHERE booking_id = $1', [booking_id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).send('Booking not found');
+    }
+
+    // Use the booking data as needed
+    const booking = result.rows[0];
+
+    // Format the date to DD-MM-YYYY
+    booking.date = moment(booking.date).format('DD-MM-YYYY');
+
+    res.render('editBookings.ejs', { booking });
+  } catch (error) {
+    console.error('Error fetching booking:', error);
+    res.status(500).send('Server error');
+  }
+} else {
+  res.redirect("/login");
+}
+});
 
 app.post('/next', async (req, res) => {
     const { date } = req.body;  // selectedDate from frontend
@@ -440,7 +467,7 @@ app.post('/next', async (req, res) => {
       res.status(500).send('Error fetching timeslots and end_times');
     }
 });
-
+ 
 
 // Submit route to process and store booking data
 app.post('/submit', async (req, res) => {
