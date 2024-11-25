@@ -29,6 +29,7 @@
           <form action="/edit" method="post" id="appointmentForm">
             <div class="row">
               <div class="col-md-6">
+                <input type="hidden" name="bookingId" value="<%= booking.booking_id %>">
                 <div class="form-group">
                     <p class="doctorname_text">Number of Attendees</p>
                     <select class="email_text" name="attendees" required>
@@ -134,8 +135,8 @@
                 <div class="row">
                   <div class="col-md-8">
                     <p class="doctorname_text" style="visibility: hidden;">Submit Button Hidden Label</p>
-                    <h1 class="doctorname_text_chosen_date" style="visibility: hidden;">Your selected meeting date is
-                      ...</h1>
+                    <p class="doctorname_text">Your Current Booking (before updating):</p>
+                      <p class="doctorname_text">Booking ID: <%=booking.booking_id %> | 📅 <%=booking.date %> | 🕒 <%=booking.start_time %> - <%=booking.end_time %></p>
                   </div>
                   <div class="col-md-2">
                     <p class="doctorname_text" style="visibility: hidden;">Submit Button Hidden Label</p>
@@ -155,4 +156,8 @@
     </div>
   </div>
   <!-- appointment section end -->
+  <script>
+    // Serialize the upcoming bookings as JSON
+    const updatingBooking = <%- JSON.stringify(booking) %>;
+</script>
 <%- include("partials/footer.ejs") %>

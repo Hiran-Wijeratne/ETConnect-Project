@@ -152,6 +152,10 @@ app.get("/auth/google/callback",
   })
 );
 
+app.get("/confirmation", async (req, res) => {
+  res.render("confirmation.ejs");
+});
+
 app.post("/register", async (req, res) => {
   const email = req.body.username;
   const password = req.body.password;
@@ -468,8 +472,6 @@ app.post('/next', async (req, res) => {
     }
 });
  
-
-// Submit route to process and store booking data
 app.post('/submit', async (req, res) => {
   if (req.isAuthenticated()) {
   let { attendees, date, start, end, purpose } = req.body;
@@ -534,8 +536,61 @@ app.post('/submit', async (req, res) => {
 }
 });
 
-app.get("/confirmation", async (req, res) => {
-  res.render("confirmation.ejs");
+app.post('/edit', async (req, res) => {
+  if (req.isAuthenticated()) {
+    try {
+      // Extract and sanitize user inputs
+      let { attendees, date, start, end, purpose, bookingId } = req.body;
+
+      // Validate inputs (basic checks, you can extend this further)
+      if (!bookingId) {
+        return res.status(400).json({ message: 'Booking ID is required.' });
+      }
+
+      if (!attendees || !date || !start || !end || !purpose) {
+        return res.status(400).json({ message: 'All fields are required.' });
+      }
+
+      // Reformat date (assuming input is in 'DD-MM-YYYY' format)
+      const [day, month, year] = date.split('-');
+      const formattedDate = `${year}-${month}-${day}`; // Convert to 'YYYY-MM-DD'
+
+      // Convert start and end times to proper format if needed
+      const startTime = start; // Assuming times are already in 'HH:mm:ss'
+      const endTime = end;
+
+      // Update the booking in the database
+      const updateQuery = `
+        UPDATE bookings
+        SET attendees = $1,
+            date = $2,
+            start_time = $3,
+            end_time = $4,
+            description = $5
+        WHERE booking_id = $6
+        RETURNING *;
+      `;
+
+      const values = [attendees, formattedDate, startTime, endTime, purpose, bookingId];
+
+      const result = await pool.query(updateQuery, values);
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ message: 'Booking not found or update failed.' });
+      }
+
+      // Respond with the updated booking details
+      res.status(200).json({
+        message: 'Booking updated successfully.',
+        booking: result.rows[0],
+      });
+    } catch (err) {
+      console.error('Error updating booking:', err.message);
+      res.status(500).json({ message: 'An error occurred while updating the booking.' });
+    }
+  } else {
+    res.status(403).json({ message: 'Unauthorized access.' });
+  }
 });
 
 passport.serializeUser((user, cb) => {

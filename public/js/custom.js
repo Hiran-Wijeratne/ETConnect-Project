@@ -535,34 +535,31 @@ $('#scrollButton').on('click', function () {
 
 
 
-
-
-
-
-
-
-var dateSelectedCustomeDatepicker = false;
-var purposeIsStated = false;
-
-// custom js
-function onDateChange($datepickerElement) {
-	const selectedDate = $datepickerElement.val().trim();
-	const $nextButton = $('#nextButton'); // Adjust to your specific button selector
-
-	if (selectedDate !== '') {
-		console.log("datepicker is selected");
-		dateSelectedCustomeDatepicker = true;
-		if (purposeIsStated) {
-			$nextButton.prop('disabled', false); // Enable the button
+	var dateSelectedCustomeDatepicker = false;
+	var purposeIsStated = false;
+	
+	// custom js
+	function onDateChange($datepickerElement) {
+		const selectedDate = $datepickerElement.val().trim();
+		const $nextButton = $('#nextButton'); // Adjust to your specific button selector
+	
+		if (selectedDate !== '') {
+			console.log("datepicker is selected");
+			dateSelectedCustomeDatepicker = true;
+			if (purposeIsStated) {
+				$nextButton.prop('disabled', false); // Enable the button
+			}
+		} else {
+			dateSelectedCustomeDatepicker = false;
+			$nextButton.prop('disabled', true); // Disable the button
+			console.log("datepicker is selected");
 		}
-	} else {
-		dateSelectedCustomeDatepicker = false;
-		$nextButton.prop('disabled', true); // Disable the button
-		console.log("datepicker is selected");
+		$('select[name="start"]').val('');
+		$('select[name="end"]').val('');
+		$('#end-time-error').remove();
 	}
-}
-
-
+	
+	
 
 
 
@@ -712,7 +709,9 @@ $(document).ready(function () {
 			},
 			success: function (response) {
 				console.log('Date sent successfully:', response);
-
+				if (!isHomePage) {
+					console.log(`The booking that is being updated: ${JSON.stringify(updatingBooking)}`);
+				}
 				// Access the timeslots and end_times arrays from the response
 				timeslots = response.timeslots;
 				startTimes = response.start_times;
@@ -727,15 +726,19 @@ $(document).ready(function () {
 
 				// Clear previous bookings
 				$('#bookingsList').empty(); 
+
+				const filteredBookingIds = !isHomePage
+        		? bookingIds.filter(id => id !== updatingBooking.booking_id)
+        		: bookingIds;
 				
-				if (bookingIds.length > 0) {
+				if (filteredBookingIds.length > 0) {
 					const title = `<h3 class="booking-title">Current Booking Overview for ${selectedDate}</h3>`;
 					$('#bookingsList').append(title);
 				}
 				
 
 				// Populate the bookings
-				bookingIds.forEach((id, index) => {
+				filteredBookingIds.forEach((id, index) => {
 					const startTime = normalizedStartTimes[index];
 					const endTime = normalizedEndTimes[index];
 			
@@ -803,6 +806,48 @@ $(document).ready(function () {
 					});
 				});
 
+				// Generate the timeslots for the updating booking when editing
+			if (!isHomePage) {
+				const updatingStartTime = updatingBooking.start_time; // Assuming format "HH:mm:ss"
+				const updatingEndTime = updatingBooking.end_time; // Assuming format "HH:mm:ss"
+
+				const generatedTimeslots = [];
+				let commenceTime = new Date(`1970-01-01T${updatingStartTime}`);
+				const finishTime = new Date(`1970-01-01T${updatingEndTime}`);
+
+				// Generate all timeslots between the start and end times
+				while (commenceTime < finishTime) {
+					const slotTime = `${commenceTime.getHours().toString().padStart(2, '0')}:` +
+						`${commenceTime.getMinutes().toString().padStart(2, '0')}:` +
+						`${commenceTime.getSeconds().toString().padStart(2, '0')}`;
+					generatedTimeslots.push(slotTime);
+					commenceTime.setHours(commenceTime.getHours() + 1);
+				}
+
+				console.log('Generated Timeslots for Updating Booking:', generatedTimeslots);
+
+				// Enable options in the "start" and "end" dropdowns for the updating booking's timeslots
+				generatedTimeslots.forEach(slot => {
+					$('select[name="start"] option').each(function () {
+						if (normalizeTimeFormat($(this).text()) === slot) {
+							$(this).prop('disabled', false).removeClass('disabled-option');
+						}
+					});
+					$('select[name="end"] option').each(function () {
+						if (normalizeTimeFormat($(this).text()) === slot) {
+							$(this).prop('disabled', false).removeClass('disabled-option');
+						}
+					});
+					// Additionally enable the exact end time of the updating booking
+    				$('select[name="end"] option').each(function () {
+        			if (normalizeTimeFormat($(this).text()) === updatingEndTime) {
+           			$(this).prop('disabled', false).removeClass('disabled-option');
+       			   		}
+    				});
+				});
+				
+			}
+
 			},
 			error: function (error) {
 				console.error('Error sending date:', error);
@@ -826,21 +871,23 @@ $(document).ready(function () {
 		$('#secondForm').hide();
 		$('#firstForm').show();
 		$('select[name="start"] option, select[name="end"] option').prop('disabled', false).removeClass('disabled-option');
-		$('#end-time-error').remove();
+		$submitButton.prop('disabled', true);
 	});
 
-
-
-
-
-
-
-
-
+	// Hide the second form and reset values when the 'back' button is clicked
+	// $backButton.on('click', function () {
+	// 	$secondForm.hide();
+	// 	$firstForm.show();
+	// 	$('#end-time-error').remove();  // Remove the warning
+	// 	$startTime.val('');             // Reset start time selection to none
+	// 	$endTime.val('');               // Reset end time selection to none
+	// 	$submitButton.prop('disabled', true); // Disable the submit button
+	// });
 
 
 	// Function to validate the start and end times
 	function validateTimes() {
+	
 		var selectedDate = $('#datepicker').val();
 		const startTime = $startTime.val();
 		const endTime = $endTime.val();
@@ -911,29 +958,7 @@ $(document).ready(function () {
 	$startTime.on('change', validateTimes);
 	$endTime.on('change', validateTimes);
 
-	// Hide the second form and reset values when the 'back' button is clicked
-	$backButton.on('click', function () {
-		$secondForm.hide();
-		$firstForm.show();
-		$('#end-time-error').remove();  // Remove the warning
-		$startTime.val('');             // Reset start time selection to none
-		$endTime.val('');               // Reset end time selection to none
-		$submitButton.prop('disabled', true); // Disable the submit button
-	});
-
-	// Optional: Reset the form if the back button is clicked
-	$('#backButton').on('click', function () {
-		// Reset all time fields and disable submit
-		$startTime.val('');
-		$endTime.val('');
-		$submitButton.prop('disabled', true);
-		$('#end-time-error').remove();  // Remove any existing warning message
-	});
-
-
-
-
-
+	
 
 	// Function to check the input value
 	function checkInput() {
