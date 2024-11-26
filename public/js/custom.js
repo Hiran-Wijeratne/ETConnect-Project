@@ -891,6 +891,28 @@ $(document).ready(function () {
 		var selectedDate = $('#datepicker').val();
 		const startTime = $startTime.val();
 		const endTime = $endTime.val();
+		let generatedUpdatingTimeslots = [];
+
+		if (!isHomePage) {
+			const updatingStartTime = updatingBooking.start_time; // Assuming format "HH:mm:ss"
+			const updatingEndTime = updatingBooking.end_time; // Assuming format "HH:mm:ss"
+
+		
+			let commenceTime = new Date(`1970-01-01T${updatingStartTime}`);
+			const finishTime = new Date(`1970-01-01T${updatingEndTime}`);
+
+			// Generate all timeslots between the start and end times
+			while (commenceTime < finishTime) {
+				const slotTime = `${commenceTime.getHours().toString().padStart(2, '0')}:` +
+					`${commenceTime.getMinutes().toString().padStart(2, '0')}:` +
+					`${commenceTime.getSeconds().toString().padStart(2, '0')}`;
+				generatedUpdatingTimeslots.push(slotTime);
+				commenceTime.setHours(commenceTime.getHours() + 1);
+			}
+			
+			const matchingItems = generatedUpdatingTimeslots.filter(item => timeslots.includes(item));
+		}
+			console.log('Generated Timeslots for Updating Booking:', generatedUpdatingTimeslots);
 
 		// Remove any existing warning message
 		$('#end-time-error').remove();
@@ -917,7 +939,12 @@ $(document).ready(function () {
 			console.log(`timeslots : ${timeslots}`);
 			console.log(`genrated timeslots : ${generatedTimeslots}`);
 
-			const matchingItems = generatedTimeslots.filter(item => timeslots.includes(item));
+			// Remove conflicts caused by the timeslot being edited
+			const relevantTimeslots = isHomePage
+            ? timeslots
+            : timeslots.filter(slot => !generatedUpdatingTimeslots.includes(slot));
+
+        const matchingItems = generatedTimeslots.filter(item => relevantTimeslots.includes(item));
 
 			if (matchingItems.length > 0) {
 				console.log('Matching items found:', matchingItems);
