@@ -6,7 +6,7 @@
         <a  id="calendarView" style="color: white;">Calendar View</a>
     </div>
 
-    <h1 class="about_taital mt-5">Upcoming Bookings</h1>
+    <h1 class="about_taital">Upcoming Bookings</h1>
     <div id="calendarContainer"> 
         <div id='calendar'></div>
     </div>
@@ -83,6 +83,28 @@
 </div>
 </div>
 
+<!-- Bootstrap Modal for Event Details -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Title:</strong> <span id="modalTitle"></span></p>
+          <p><strong>Start:</strong> <span id="modalStart"></span></p>
+          <p><strong>End:</strong> <span id="modalEnd"></span></p>
+          <p><strong>Attendees:</strong> <span id="modalAttendees"></span></p>
+          <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 
 <script>
     // Serialize the upcoming bookings as JSON

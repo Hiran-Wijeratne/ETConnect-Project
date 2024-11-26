@@ -314,23 +314,62 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
     background-color: #e04848;
   }
 
+
+
+
+
   #calendar {
     margin: 20px auto;
     width: 100%;
 }
 
 .fc-event-title {
-    font-size: 12px; /* Adjust event title font size */
+    font-size: 15px important!; /* Adjust event title font size */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color:#000;
 }
 .fc-event-time {
-    font-size: 10px; /* Adjust event time font size */
+    font-size: 12px; /* Adjust event time font size */
+    color: #666;
 }
+
+
+.fc-event {
+    padding: 2px; /* Reduce padding */
+    border-radius: 5px; /* Add rounded corners */
+    background-color: #0cb7d6; /* Custom background color */
+    color: white; /* Text color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+/* Add this to your CSS or inline styles */
+.modal-backdrop {
+    z-index: 1050 !important; /* Higher than the shader's z-index */
+}
+
+.modal {
+    z-index: 1060 !important; /* Even higher than the backdrop */
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 #pastMyBookingsSection {
     overflow-x: auto;
 }
 
-
+/* 
 .modal {
     position: fixed;
     top: 50%;
@@ -339,7 +378,6 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
     background-color: white;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1001;
     border-radius: 8px;
   }
   
@@ -365,7 +403,7 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
     z-index: 1000;
   }
   
-   
+    */
 /* custom css end */
 
 

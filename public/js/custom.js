@@ -466,7 +466,7 @@ $('#calendarView').click(function () {
             start: startDate,
             end: endDate,
             description: booking.description,
-            attendees: booking.attendees
+            attendees: booking.attendees,
         };
 
         console.log("Mapped Event:", event); // Log each event for debugging
@@ -485,15 +485,45 @@ $('#calendarView').click(function () {
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
-            eventContent: function (info) {
-                const startTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const endTime = info.event.end ? info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-                const personName = info.event.title || 'Unknown';
-
-                const content = document.createElement('div');
-                content.innerHTML = `<strong>${personName}</strong><br>${startTime} - ${endTime}`;
-                return { domNodes: [content] };
-            }
+			businessHours: {
+				daysOfWeek: [1, 2, 3, 4, 5], // Monday to Friday (1 = Monday, 5 = Friday)
+				startTime: '09:00', // Start at 9 AM
+				endTime: '18:00',   // End at 5 PM
+			},
+			hiddenDays: [0, 6], // Hide Sunday (0) and Saturday (6)
+			slotMinTime: '09:00', // Earliest time displayed
+			slotMaxTime: '18:00', // Latest time displayed
+			eventClick: function(info) {
+				// Populate the modal with event details
+				const event = info.event;
+				$('#modalTitle').text(event.title);
+				$('#modalStart').text(event.start.toLocaleString());
+				$('#modalEnd').text(event.end ? event.end.toLocaleString() : 'N/A');
+				$('#modalAttendees').text(event.extendedProps.attendees || 'No attendees');
+				$('#modalDescription').text(event.extendedProps.description || 'No description');
+	
+				// Show the modal
+				$('#eventModal').modal('show');
+			},
+			eventContent: function (info) {
+				// Truncate the title if it's too long
+				const maxLength = 15; // Maximum length for the title
+				const fullTitle = info.event.title || 'Unknown';
+				const shortTitle = fullTitle.length > maxLength ? `${fullTitle.substring(0, maxLength)}...` : fullTitle;
+			
+				const startTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+				const endTime = info.event.end ? info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+			
+				const content = document.createElement('div');
+				content.innerHTML = `<strong>${shortTitle}</strong><br>${startTime} - ${endTime}`;
+			
+				// Add a tooltip for the full title
+				content.title = fullTitle; // Tooltip to show the full title on hover
+			
+				return { domNodes: [content] };
+			}
+			
+			
         });
         calendarInstance.render();
     }
