@@ -538,60 +538,108 @@ app.post('/submit', async (req, res) => {
 
 app.post('/edit', async (req, res) => {
   if (req.isAuthenticated()) {
+    // Extract bookingId and other fields from the form submission
+    const { bookingId, attendees, date, start, end, purpose } = req.body;
+
+    // Set default values if attendees or purpose are not provided
+    const updatedAttendees = attendees || 2;
+    const updatedPurpose = purpose || 'Not Stated';
+
+    // Reformat date and convert times to 24-hour format
+    const [day, month, year] = date.split('-');
+    const formattedDate = `${year}-${month}-${day}`;
+
     try {
-      // Extract and sanitize user inputs
-      let { attendees, date, start, end, purpose, bookingId } = req.body;
+      // Step 1: Update the booking details in the bookings table
+      await pool.query(
+        `UPDATE bookings
+         SET date = $1, start_time = $2, end_time = $3, description = $4, attendees = $5, created_at = NOW()
+         WHERE booking_id = $6`,
+        [formattedDate, start, end, updatedPurpose, updatedAttendees, bookingId]
+      );
 
-      // Validate inputs (basic checks, you can extend this further)
-      if (!bookingId) {
-        return res.status(400).json({ message: 'Booking ID is required.' });
+      // Step 2: Remove existing timeslots for the booking
+      await pool.query(
+        `DELETE FROM timeslots
+         WHERE booking_id = $1`,
+        [bookingId]
+      );
+
+      // Step 3: Generate and insert new timeslots
+      const timeslots = [];
+      let startTime = new Date(`1970-01-01T${start}`); // Convert to Date object
+      let endTime = new Date(`1970-01-01T${end}`);     // Convert to Date object
+
+      while (startTime < endTime) {
+        const slotTime = startTime.toTimeString().substring(0, 5);
+        timeslots.push(slotTime);
+
+        // Insert each new timeslot into the timeslots table
+        await pool.query(
+          `INSERT INTO timeslots (booking_id, timeslot)
+           VALUES ($1, $2)`,
+          [bookingId, slotTime]
+        );
+
+        // Increment the start time by 1 hour
+        startTime.setHours(startTime.getHours() + 1);
       }
 
-      if (!attendees || !date || !start || !end || !purpose) {
-        return res.status(400).json({ message: 'All fields are required.' });
-      }
-
-      // Reformat date (assuming input is in 'DD-MM-YYYY' format)
-      const [day, month, year] = date.split('-');
-      const formattedDate = `${year}-${month}-${day}`; // Convert to 'YYYY-MM-DD'
-
-      // Convert start and end times to proper format if needed
-      const startTime = start; // Assuming times are already in 'HH:mm:ss'
-      const endTime = end;
-
-      // Update the booking in the database
-      const updateQuery = `
-        UPDATE bookings
-        SET attendees = $1,
-            date = $2,
-            start_time = $3,
-            end_time = $4,
-            description = $5
-        WHERE booking_id = $6
-        RETURNING *;
-      `;
-
-      const values = [attendees, formattedDate, startTime, endTime, purpose, bookingId];
-
-      const result = await pool.query(updateQuery, values);
-
-      if (result.rowCount === 0) {
-        return res.status(404).json({ message: 'Booking not found or update failed.' });
-      }
-
-      // Respond with the updated booking details
-      res.status(200).json({
-        message: 'Booking updated successfully.',
-        booking: result.rows[0],
+      res.render('confirmation.ejs', {
+        booking: {
+          id: bookingId,
+          date: `${day}-${month}-${year}`, // Reformat for display
+          startTime: start,
+          endTime: end,
+          attendees: updatedAttendees,
+          purpose: updatedPurpose,
+        },
+        timeslots,
       });
-    } catch (err) {
-      console.error('Error updating booking:', err.message);
-      res.status(500).json({ message: 'An error occurred while updating the booking.' });
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      res.status(500).send('Error updating booking');
     }
   } else {
-    res.status(403).json({ message: 'Unauthorized access.' });
+    res.redirect('/login');
   }
 });
+
+app.get('/delete/:id', async (req, res) => {
+  if (req.isAuthenticated()) {
+    const bookingId = req.params.id; // Extract bookingId from the form
+
+    try {
+      // Step 1: Delete timeslots associated with the booking
+      await pool.query(
+        `DELETE FROM timeslots
+         WHERE booking_id = $1`,
+        [bookingId]
+      );
+
+      // Step 2: Delete the booking itself
+      await pool.query(
+        `DELETE FROM bookings
+         WHERE booking_id = $1`,
+        [bookingId]
+      );
+
+      res.render('delete-confirmation.ejs', {
+        bookingId,
+      });
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+      res.status(500).send('Error deleting booking');
+    }
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.get('delete-confirmation', (req, res) => {
+  res.render('delete-confirmation.ejs');
+});
+
 
 passport.serializeUser((user, cb) => {
   cb(null, user.user_id); // Serialize user_id to session
