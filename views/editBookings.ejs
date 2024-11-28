@@ -32,7 +32,7 @@
                 <input type="hidden" name="bookingId" value="<%= booking.booking_id %>">
                 <div class="form-group">
                     <p class="doctorname_text">Number of Attendees</p>
-                    <select class="email_text" name="attendees" required>
+                    <select class="wide" name="attendees" required>
                         <option value="">Maximum Attendees</option>
                         <% [2, 4, 6, 8, 10, 12].forEach(count => { %>
                             <option value="<%= count %>" <%= booking.attendees == count ? 'selected' : '' %>><%= count %></option>
@@ -84,9 +84,11 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <p class="doctorname_text">Start Time</p>
-                    <select class="email_text" name="start" required>
-                      <!-- <select class="email_text" name="start" required> -->
-                        <% ['08:00', '09:00', '10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'].forEach(time => { %>
+                    <select class="wide" name="start" required>
+                      <option value="">Select Your End Time</option>
+                      <!-- <select class="wide" name="start" required> -->
+                        <% ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30','13:00',
+                        '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'].forEach(time => { %>
                             <option value="<%= time %>" <%= booking.start_time === time ? 'selected' : '' %>><%= time %></option>
                         <% }); %>
                     </select>
@@ -107,9 +109,11 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <p class="doctorname_text">End Time</p>
-                    <select class="email_text" name="end" required>
-                      <% ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00' ].forEach(time => { %>
-                          <option value="<%= time %>" <%= booking.end_time === time ? 'selected' : '' %>><%= time %></option>
+                    <select class="wide" name="end" required>
+                      <option value="">Select Your End Time</option>
+                      <% ['08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30','13:00',
+                      '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'].forEach(time => { %>
+                      <option value="<%= time %>" <%= booking.end_time === time ? 'selected' : '' %>><%= time %></option>
                       <% }); %>
                       <!-- <option>Select Your End Time</option>
                       <option value="09:00:00">09:00:00 </option>

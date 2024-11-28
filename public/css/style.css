@@ -902,7 +902,7 @@ button {
     border: 1px solid #cfcfcf !important;
     /* padding: 10px 20px; */
     font-size: 18px !important;
-    color: #898989 !important;
+    /* color: #898989 !important; */
     display: flex;
     align-items: center;
 }

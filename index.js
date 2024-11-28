@@ -100,7 +100,7 @@ app.use(async (req, res, next) => {
     // Filter days with more than 10 time slots
     const datesWithTooManyTimeSlots = [];
     for (const date in timeSlotsCount) {
-      if (timeSlotsCount[date] > 9) {
+      if (timeSlotsCount[date] >= 20) {
         datesWithTooManyTimeSlots.push(date);
       }
     }
@@ -516,7 +516,7 @@ app.post('/submit', async (req, res) => {
       );
 
       // Increment the start time by 1 hour
-      startTime.setHours(startTime.getHours() + 1);
+      startTime.setMinutes(startTime.getMinutes() + 30);
     }
 
     // res.send({ message: 'Form submitted successfully', timeslots, formattedDate });
@@ -586,7 +586,7 @@ app.post('/edit', async (req, res) => {
         );
 
         // Increment the start time by 1 hour
-        startTime.setHours(startTime.getHours() + 1);
+        startTime.setMinutes(startTime.getMinutes() + 30);
       }
 
       res.render('confirmation.ejs', {

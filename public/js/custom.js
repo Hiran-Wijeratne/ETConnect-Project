@@ -551,6 +551,18 @@ $(document).ready(function () {
 	});
 });
 
+// On the current page
+$('button[title="Edit"]').on('click', function () {
+	console.log('Edit button clicked. Navigating to edit page...');
+});
+
+// On the target page
+$(document).ready(function () {
+	if (window.location.pathname.includes('/edit-booking/')) {
+		$('select').niceSelect('update');
+	}
+});
+
 
 
 
@@ -582,7 +594,7 @@ $('#toggleMyPastBookings').on('click', function () {
 	}
 });
 
-  
+
 
 
 
@@ -790,20 +802,34 @@ $(document).ready(function () {
 				// Clear previous bookings
 				$('#bookingsList').empty();
 
-				const filteredBookingIds = !isHomePage
-					? bookingIds.filter(id => id !== updatingBooking.booking_id)
-					: bookingIds;
+				let filteredBookingIds, filteredStartTimes, filteredEndTimes;
 
-				if (filteredBookingIds.length > 0) {
-					const title = `<h3 class="booking-title">Current Booking Overview for ${selectedDate}</h3>`;
-					$('#bookingsList').append(title);
+				// Separate logic for homepage and editing
+				if (isHomePage) {
+					filteredBookingIds = bookingIds; // Show all booking IDs on homepage
+					filteredStartTimes = startTimes;
+					filteredEndTimes = endTimes;
+
+				} else {
+					// Filter all arrays based on the booking being edited
+					const indicesToKeep = bookingIds.map((id, index) => id !== updatingBooking.booking_id ? index : null).filter(index => index !== null);
+
+					filteredBookingIds = indicesToKeep.map(index => bookingIds[index]);
+					filteredStartTimes = indicesToKeep.map(index => startTimes[index]);
+					filteredEndTimes = indicesToKeep.map(index => endTimes[index]);
+					console.log(filteredBookingIds);
+					console.log(filteredStartTimes);
+					console.log(filteredEndTimes);
 				}
 
 
 				// Populate the bookings
 				filteredBookingIds.forEach((id, index) => {
-					const startTime = normalizedStartTimes[index];
-					const endTime = normalizedEndTimes[index];
+					const normalizedFilteredEndTimes = filteredEndTimes.map(time => normalizeTimeFormat(time));
+					const normalizedFilteredStartTimes = filteredStartTimes.map(time => normalizeTimeFormat(time));
+
+					const startTime = normalizedFilteredStartTimes[index];
+					const endTime = normalizedFilteredEndTimes[index];
 
 					// Create a booking card or list item
 					const bookingItem = `
@@ -825,7 +851,7 @@ $(document).ready(function () {
 					$('select[name="end"] option').each(function () {
 						if (normalizeTimeFormat($(this).text()) === endTime) {
 							$(this).prop('disabled', true).addClass('disabled-option');
-							$(this).closest('.nice-select').find('.option').each(function() {
+							$(this).closest('.nice-select').find('.option').each(function () {
 								if ($(this).text() === endTime) {
 									$(this).addClass('disabled');
 								}
@@ -833,25 +859,25 @@ $(document).ready(function () {
 						}
 					});
 				});
-		
+
 				// Disable corresponding options in the "start" and "end" select dropdowns based on timeslots
 				normalizedTimeslots.forEach(slot => {
 					$('select[name="start"] option').each(function () {
 						if (normalizeTimeFormat($(this).text()) === slot) {
 							$(this).prop('disabled', true).addClass('disabled-option');
-							$(this).closest('.nice-select').find('.option').each(function() {
+							$(this).closest('.nice-select').find('.option').each(function () {
 								if ($(this).text() === slot) {
 									$(this).addClass('disabled');
 								}
 							});
 						}
 					});
-		
+
 					// Disable the corresponding option in the "end" select dropdown
 					$('select[name="end"] option').each(function () {
 						if (normalizeTimeFormat($(this).text()) === slot) {
 							$(this).prop('disabled', true).addClass('disabled-option');
-							$(this).closest('.nice-select').find('.option').each(function() {
+							$(this).closest('.nice-select').find('.option').each(function () {
 								if ($(this).text() === slot) {
 									$(this).addClass('disabled');
 								}
@@ -859,13 +885,13 @@ $(document).ready(function () {
 						}
 					});
 				});
-		
+
 				// Enable corresponding options in the "end" select dropdown based on start_time
 				normalizedStartTimes.forEach(startTime => {
 					$('select[name="end"] option').each(function () {
 						if (normalizeTimeFormat($(this).text()) === startTime) {
 							$(this).prop('disabled', false).removeClass('disabled-option');
-							$(this).closest('.nice-select').find('.option').each(function() {
+							$(this).closest('.nice-select').find('.option').each(function () {
 								if ($(this).text() === startTime) {
 									$(this).removeClass('disabled');
 								}
@@ -873,7 +899,7 @@ $(document).ready(function () {
 						}
 					});
 				});
-		
+
 				// **NEW LOGIC**: Disable overlapping times in the "end" dropdown.
 				// If any time in normalizedStartTimes is also in normalizedEndTimes, disable it in the "end" dropdown.
 				normalizedStartTimes.forEach(startTime => {
@@ -882,7 +908,7 @@ $(document).ready(function () {
 							$('select[name="end"] option').each(function () {
 								if (normalizeTimeFormat($(this).text()) === startTime) {
 									$(this).prop('disabled', true).addClass('disabled-option');
-									$(this).closest('.nice-select').find('.option').each(function() {
+									$(this).closest('.nice-select').find('.option').each(function () {
 										if ($(this).text() === startTime) {
 											$(this).addClass('disabled');
 										}
@@ -893,7 +919,7 @@ $(document).ready(function () {
 					});
 				});
 
-				$('select').niceSelect('update');
+
 
 
 				// Generate the timeslots for the updating booking when editing
@@ -910,7 +936,7 @@ $(document).ready(function () {
 						const slotTime = `${commenceTime.getHours().toString().padStart(2, '0')}:` +
 							`${commenceTime.getMinutes().toString().padStart(2, '0')}`;
 						generatedTimeslots.push(slotTime);
-						commenceTime.setHours(commenceTime.getHours() + 1);
+						commenceTime.setMinutes(commenceTime.getMinutes() + 30);
 					}
 
 					console.log('Generated Timeslots for Updating Booking:', generatedTimeslots);
@@ -937,6 +963,7 @@ $(document).ready(function () {
 
 				}
 
+				$('select').niceSelect('update');
 			},
 			error: function (error) {
 				console.error('Error sending date:', error);
@@ -995,7 +1022,7 @@ $(document).ready(function () {
 				const slotTime = `${commenceTime.getHours().toString().padStart(2, '0')}:` +
 					`${commenceTime.getMinutes().toString().padStart(2, '0')}`;
 				generatedUpdatingTimeslots.push(slotTime);
-				commenceTime.setHours(commenceTime.getHours() + 1);
+				commenceTime.setMinutes(commenceTime.getMinutes() + 30);
 			}
 
 			const matchingItems = generatedUpdatingTimeslots.filter(item => timeslots.includes(item));
@@ -1020,7 +1047,7 @@ $(document).ready(function () {
 					`${commenceTime.getMinutes().toString().padStart(2, '0')}`;
 				generatedTimeslots.push(slotTime);
 				// Increment the start time by 1 hour
-				commenceTime.setHours(commenceTime.getHours() + 1);
+				commenceTime.setMinutes(commenceTime.getMinutes() + 30);
 			}
 
 			console.log(`timeslots : ${timeslots}`);
