@@ -443,91 +443,92 @@ $(function () {
 
 $(document).ready(function () {
 
-$('#calendarContainer').hide();
-console.log(upcomingBookings);
-let calendarInstance;
-$('#calendarView').click(function () {
-    $('#calendarContainer').toggle();
-    $('#bookingsTableContainer').toggle();
+	$('#calendarContainer').hide();
+	console.log(upcomingBookings);
+	let calendarInstance;
+	$('#calendarView').click(function () {
+		$('#calendarContainer').toggle();
+		$('#bookingsTableContainer').toggle();
 
-    // Preprocess the upcomingBookings data to correct the date format
-    const calendarEvents = upcomingBookings.map(booking => {
-        // Convert 'DD-MM-YYYY' to 'YYYY-MM-DD'
-        const [day, month, year] = booking.date.split('-'); // Split the date by '-'
-        const formattedDate = `${year}-${month}-${day}`; // Rearrange to 'YYYY-MM-DD'
+		// Preprocess the upcomingBookings data to correct the date format
+		const calendarEvents = upcomingBookings.map(booking => {
+			// Convert 'DD-MM-YYYY' to 'YYYY-MM-DD'
+			const [day, month, year] = booking.date.split('-'); // Split the date by '-'
+			const formattedDate = `${year}-${month}-${day}`; // Rearrange to 'YYYY-MM-DD'
 
-        // Construct the start and end dates
-        const startDate = new Date(`${formattedDate}T${booking.start_time}`);
-        const endDate = new Date(`${formattedDate}T${booking.end_time}`);
+			// Construct the start and end dates
+			const startDate = new Date(`${formattedDate}T${booking.start_time}`);
+			const endDate = new Date(`${formattedDate}T${booking.end_time}`);
 
-        // Create the event object
-        const event = {
-            title: booking.username,
-            start: startDate,
-            end: endDate,
-            description: booking.description,
-            attendees: booking.attendees,
-        };
+			// Create the event object
+			const event = {
+				title: booking.username,
+				start: startDate,
+				end: endDate,
+				description: booking.description,
+				attendees: booking.attendees,
+			};
 
-        console.log("Mapped Event:", event); // Log each event for debugging
+			console.log("Mapped Event:", event); // Log each event for debugging
 
-        return event;
-    });
+			return event;
+		});
 
-    // If the calendar is already initialized, just show it
-    if (!calendarInstance) {
-        const calendarEl = document.getElementById('calendar');
-        calendarInstance = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            events: calendarEvents, // Use the processed events
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-			businessHours: {
-				daysOfWeek: [1, 2, 3, 4, 5], // Monday to Friday (1 = Monday, 5 = Friday)
-				startTime: '09:00', // Start at 9 AM
-				endTime: '18:00',   // End at 5 PM
-			},
-			hiddenDays: [0, 6], // Hide Sunday (0) and Saturday (6)
-			slotMinTime: '09:00', // Earliest time displayed
-			slotMaxTime: '18:00', // Latest time displayed
-			eventClick: function(info) {
-				// Populate the modal with event details
-				const event = info.event;
-				$('#modalTitle').text(event.title);
-				$('#modalStart').text(event.start.toLocaleString());
-				$('#modalEnd').text(event.end ? event.end.toLocaleString() : 'N/A');
-				$('#modalAttendees').text(event.extendedProps.attendees || 'No attendees');
-				$('#modalDescription').text(event.extendedProps.description || 'No description');
-	
-				// Show the modal
-				$('#eventModal').modal('show');
-			},
-			eventContent: function (info) {
-				// Truncate the title if it's too long
-				const maxLength = 15; // Maximum length for the title
-				const fullTitle = info.event.title || 'Unknown';
-				const shortTitle = fullTitle.length > maxLength ? `${fullTitle.substring(0, maxLength)}...` : fullTitle;
-			
-				const startTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-				const endTime = info.event.end ? info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
-			
-				const content = document.createElement('div');
-				content.innerHTML = `<strong>${shortTitle}</strong><br>${startTime} - ${endTime}`;
-			
-				// Add a tooltip for the full title
-				content.title = fullTitle; // Tooltip to show the full title on hover
-			
-				return { domNodes: [content] };
-			}
-			
-			
-        });
-        calendarInstance.render();
-    }
-});
+		// If the calendar is already initialized, just show it
+		if (!calendarInstance) {
+			const calendarEl = document.getElementById('calendar');
+			calendarInstance = new FullCalendar.Calendar(calendarEl, {
+				// themeSystem: 'bootstrap',
+				initialView: 'dayGridMonth',
+				events: calendarEvents, // Use the processed events
+				headerToolbar: {
+					left: 'prev,next today',
+					center: 'title',
+					right: 'dayGridMonth,timeGridWeek,timeGridDay'
+				},
+				businessHours: {
+					daysOfWeek: [1, 2, 3, 4, 5], // Monday to Friday (1 = Monday, 5 = Friday)
+					startTime: '09:00', // Start at 9 AM
+					endTime: '18:00',   // End at 5 PM
+				},
+				hiddenDays: [0, 6], // Hide Sunday (0) and Saturday (6)
+				slotMinTime: '09:00', // Earliest time displayed
+				slotMaxTime: '18:00', // Latest time displayed
+				eventClick: function (info) {
+					// Populate the modal with event details
+					const event = info.event;
+					$('#modalTitle').text(event.title);
+					$('#modalStart').text(event.start.toLocaleString());
+					$('#modalEnd').text(event.end ? event.end.toLocaleString() : 'N/A');
+					$('#modalAttendees').text(event.extendedProps.attendees || 'No attendees');
+					$('#modalDescription').text(event.extendedProps.description || 'No description');
+
+					// Show the modal
+					$('#eventModal').modal('show');
+				},
+				eventContent: function (info) {
+					// Truncate the title if it's too long
+					const maxLength = 15; // Maximum length for the title
+					const fullTitle = info.event.title || 'Unknown';
+					const shortTitle = fullTitle.length > maxLength ? `${fullTitle.substring(0, maxLength)}...` : fullTitle;
+
+					const startTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+					const endTime = info.event.end ? info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+
+					const content = document.createElement('div');
+					content.innerHTML = `<strong>${shortTitle}</strong><br>${startTime} - ${endTime}`;
+
+					// Add a tooltip for the full title
+					content.title = fullTitle; // Tooltip to show the full title on hover
+
+					return { domNodes: [content] };
+				}
+
+
+			});
+			calendarInstance.render();
+		}
+	});
 });
 
 
@@ -536,60 +537,60 @@ $('#calendarView').click(function () {
 
 $('#scrollButton').on('click', function () {
 	$('html, body').animate({
-	  scrollTop: $('.scroll-marker').offset().top
+		scrollTop: $('.scroll-marker').offset().top
 	}, 'slow'); // Adjust speed ('slow', 'fast', or a number in milliseconds)
-  });
+});
 
-	$('#togglePastBookings').on('click', function () {
-		$('#pastBookingsSection').toggle();
-	
-		// Adjust the table after it becomes visible
-		if ($('#pastBookingsSection').is(':visible')) {
-			var table = $('#pastTable').DataTable();
-			table.columns.adjust().draw(); // Recalculate column widths
-		}
-	});
-	
+$('#togglePastBookings').on('click', function () {
+	$('#pastBookingsSection').toggle();
 
-	$('#toggleMyPastBookings').on('click', function () {
-		$('#pastMyBookingsSection').toggle();
-	
-		// Adjust the table after it becomes visible
-		if ($('#pastMyBookingsSection').is(':visible')) {
-			var table = $('#myPastTable').DataTable();
-			table.columns.adjust().draw(); // Recalculate column widths
-		}
-	});
-	
-
-
-
-
-	var dateSelectedCustomeDatepicker = false;
-	var purposeIsStated = false;
-	
-	// custom js
-	function onDateChange($datepickerElement) {
-		const selectedDate = $datepickerElement.val().trim();
-		const $nextButton = $('#nextButton'); // Adjust to your specific button selector
-	
-		if (selectedDate !== '') {
-			console.log("datepicker is selected");
-			dateSelectedCustomeDatepicker = true;
-			if (purposeIsStated) {
-				$nextButton.prop('disabled', false); // Enable the button
-			}
-		} else {
-			dateSelectedCustomeDatepicker = false;
-			$nextButton.prop('disabled', true); // Disable the button
-			console.log("datepicker is selected");
-		}
-		$('select[name="start"]').val('');
-		$('select[name="end"]').val('');
-		$('#end-time-error').remove();
+	// Adjust the table after it becomes visible
+	if ($('#pastBookingsSection').is(':visible')) {
+		var table = $('#pastTable').DataTable();
+		table.columns.adjust().draw(); // Recalculate column widths
 	}
-	
-	
+});
+
+
+$('#toggleMyPastBookings').on('click', function () {
+	$('#pastMyBookingsSection').toggle();
+
+	// Adjust the table after it becomes visible
+	if ($('#pastMyBookingsSection').is(':visible')) {
+		var table = $('#myPastTable').DataTable();
+		table.columns.adjust().draw(); // Recalculate column widths
+	}
+});
+
+
+
+
+
+var dateSelectedCustomeDatepicker = false;
+var purposeIsStated = false;
+
+// custom js
+function onDateChange($datepickerElement) {
+	const selectedDate = $datepickerElement.val().trim();
+	const $nextButton = $('#nextButton'); // Adjust to your specific button selector
+
+	if (selectedDate !== '') {
+		console.log("datepicker is selected");
+		dateSelectedCustomeDatepicker = true;
+		if (purposeIsStated) {
+			$nextButton.prop('disabled', false); // Enable the button
+		}
+	} else {
+		dateSelectedCustomeDatepicker = false;
+		$nextButton.prop('disabled', true); // Disable the button
+		console.log("datepicker is selected");
+	}
+	$('select[name="start"]').val('');
+	$('select[name="end"]').val('');
+	$('#end-time-error').remove();
+}
+
+
 
 
 
@@ -611,7 +612,7 @@ $(document).ready(function () {
 	// Disable the submit and next buttons initially
 	$submitButton.prop('disabled', true);
 	if (isHomePage) {
-	$nextButton.prop('disabled', true);
+		$nextButton.prop('disabled', true);
 	}
 
 
@@ -619,27 +620,27 @@ $(document).ready(function () {
 	let startTimes = [];
 	let endTimes = [];
 
-	
+
 
 
 	// Initialize DataTables for upcoming bookings
-    $('#upcomingTable').DataTable({
+	$('#upcomingTable').DataTable({
 		order: [],
 		paging: true,
 		searching: true,
 		ordering: true,
 		info: true,
 		columnDefs: [
-		  { orderable: false, targets: [5, 6] } // Disable sorting for the 'Description' column
+			{ orderable: false, targets: [5, 6] } // Disable sorting for the 'Description' column
 		],
 		stateSave: true,
 		responsive: true,  // Ensures the table is responsive
-        autoWidth: true,   // Disables automatic column width calculations
+		autoWidth: true,   // Disables automatic column width calculations
 		scrollX: true
-	  });
-  
-	  // Initialize DataTables for past bookings
-	  $('#pastTable').DataTable({
+	});
+
+	// Initialize DataTables for past bookings
+	$('#pastTable').DataTable({
 		order: [],
 		paging: true,
 		searching: true,
@@ -647,12 +648,12 @@ $(document).ready(function () {
 		info: true,
 		stateSave: true,
 		responsive: true,  // Ensures the table is responsive
-        autoWidth: true,   // Disables automatic column width calculations
+		autoWidth: true,   // Disables automatic column width calculations
 		scrollX: true
-	  });
+	});
 
-	  // Initialize DataTables for upcoming bookings
-	  $('#myUpcomingTable').DataTable({
+	// Initialize DataTables for upcoming bookings
+	$('#myUpcomingTable').DataTable({
 		order: [],
 		paging: true,
 		searching: true,
@@ -663,12 +664,12 @@ $(document).ready(function () {
 		// ],
 		stateSave: true,
 		responsive: true,  // Ensures the table is responsive
-        autoWidth: true,   // Disables automatic column width calculations
+		autoWidth: true,   // Disables automatic column width calculations
 		scrollX: true
-	  });
-  
-	  // Initialize DataTables for past bookings
-	  $('#myPastTable').DataTable({
+	});
+
+	// Initialize DataTables for past bookings
+	$('#myPastTable').DataTable({
 		order: [],
 		paging: true,
 		searching: true,
@@ -685,7 +686,7 @@ $(document).ready(function () {
 
 	// Event listener for the "Next" button
 	$nextButton.on('click', function () {
-	
+
 		// Get the selected date from the datepicker
 		var selectedDate = $datepicker.val();
 
@@ -705,27 +706,31 @@ $(document).ready(function () {
 		// AJAX call to get the available timeslots for the selected date
 		// Normalize time format function
 		function normalizeTimeFormat(time) {
-			// If it's a string, trim it and return it
+
+			// If it's a string, trim it and return it without seconds
 			if (typeof time === 'string') {
-				return time.trim();
+				const trimmedTime = time.trim();
+				const [hours, minutes] = trimmedTime.split(':'); // Split by ':'
+				return `${hours}:${minutes}`; // Return hours and minutes
 			}
 
-			// If it's a Date object, convert it to HH:mm:ss format
-			if (time instanceof Date) {
-				const hours = time.getHours().toString().padStart(2, '0');
-				const minutes = time.getMinutes().toString().padStart(2, '0');
-				const seconds = time.getSeconds().toString().padStart(2, '0');
-				return `${hours}:${minutes}:${seconds}`;
-			}
 
-			// If it's a number (timestamp), convert it to a Date and format it
-			if (typeof time === 'number') {
-				const date = new Date(time);
-				const hours = date.getHours().toString().padStart(2, '0');
-				const minutes = date.getMinutes().toString().padStart(2, '0');
-				const seconds = date.getSeconds().toString().padStart(2, '0');
-				return `${hours}:${minutes}:${seconds}`;
-			}
+			// // If it's a Date object, convert it to HH:mm:ss format
+			// if (time instanceof Date) {
+			// 	const hours = time.getHours().toString().padStart(2, '0');
+			// 	const minutes = time.getMinutes().toString().padStart(2, '0');
+			// 	const seconds = time.getSeconds().toString().padStart(2, '0');
+			// 	return `${hours}:${minutes}`;
+			// }
+
+			// // If it's a number (timestamp), convert it to a Date and format it
+			// if (typeof time === 'number') {
+			// 	const date = new Date(time);
+			// 	const hours = date.getHours().toString().padStart(2, '0');
+			// 	const minutes = date.getMinutes().toString().padStart(2, '0');
+			// 	const seconds = date.getSeconds().toString().padStart(2, '0');
+			// 	return `${hours}:${minutes}`;
+			// }
 
 			// Return null for unexpected types
 			return null;
@@ -754,24 +759,28 @@ $(document).ready(function () {
 				const normalizedTimeslots = timeslots.map(time => normalizeTimeFormat(time));
 				const normalizedStartTimes = startTimes.map(time => normalizeTimeFormat(time));
 
+				console.log(normalizedEndTimes);
+				console.log(normalizedStartTimes);
+				console.log(normalizedTimeslots);
+
 				// Clear previous bookings
-				$('#bookingsList').empty(); 
+				$('#bookingsList').empty();
 
 				const filteredBookingIds = !isHomePage
-        		? bookingIds.filter(id => id !== updatingBooking.booking_id)
-        		: bookingIds;
-				
+					? bookingIds.filter(id => id !== updatingBooking.booking_id)
+					: bookingIds;
+
 				if (filteredBookingIds.length > 0) {
 					const title = `<h3 class="booking-title">Current Booking Overview for ${selectedDate}</h3>`;
 					$('#bookingsList').append(title);
 				}
-				
+
 
 				// Populate the bookings
 				filteredBookingIds.forEach((id, index) => {
 					const startTime = normalizedStartTimes[index];
 					const endTime = normalizedEndTimes[index];
-			
+
 					// Create a booking card or list item
 					const bookingItem = `
 						<div class="booking-item">
@@ -837,46 +846,45 @@ $(document).ready(function () {
 				});
 
 				// Generate the timeslots for the updating booking when editing
-			if (!isHomePage) {
-				const updatingStartTime = updatingBooking.start_time; // Assuming format "HH:mm:ss"
-				const updatingEndTime = updatingBooking.end_time; // Assuming format "HH:mm:ss"
+				if (!isHomePage) {
+					const updatingStartTime = updatingBooking.start_time; // Assuming format "HH:mm:ss"
+					const updatingEndTime = updatingBooking.end_time; // Assuming format "HH:mm:ss"
 
-				const generatedTimeslots = [];
-				let commenceTime = new Date(`1970-01-01T${updatingStartTime}`);
-				const finishTime = new Date(`1970-01-01T${updatingEndTime}`);
+					const generatedTimeslots = [];
+					let commenceTime = new Date(`1970-01-01T${updatingStartTime}`);
+					const finishTime = new Date(`1970-01-01T${updatingEndTime}`);
 
-				// Generate all timeslots between the start and end times
-				while (commenceTime < finishTime) {
-					const slotTime = `${commenceTime.getHours().toString().padStart(2, '0')}:` +
-						`${commenceTime.getMinutes().toString().padStart(2, '0')}:` +
-						`${commenceTime.getSeconds().toString().padStart(2, '0')}`;
-					generatedTimeslots.push(slotTime);
-					commenceTime.setHours(commenceTime.getHours() + 1);
+					// Generate all timeslots between the start and end times
+					while (commenceTime < finishTime) {
+						const slotTime = `${commenceTime.getHours().toString().padStart(2, '0')}:` +
+							`${commenceTime.getMinutes().toString().padStart(2, '0')}`;
+						generatedTimeslots.push(slotTime);
+						commenceTime.setHours(commenceTime.getHours() + 1);
+					}
+
+					console.log('Generated Timeslots for Updating Booking:', generatedTimeslots);
+
+					// Enable options in the "start" and "end" dropdowns for the updating booking's timeslots
+					generatedTimeslots.forEach(slot => {
+						$('select[name="start"] option').each(function () {
+							if (normalizeTimeFormat($(this).text()) === slot) {
+								$(this).prop('disabled', false).removeClass('disabled-option');
+							}
+						});
+						$('select[name="end"] option').each(function () {
+							if (normalizeTimeFormat($(this).text()) === slot) {
+								$(this).prop('disabled', false).removeClass('disabled-option');
+							}
+						});
+						// Additionally enable the exact end time of the updating booking
+						$('select[name="end"] option').each(function () {
+							if (normalizeTimeFormat($(this).text()) === updatingEndTime) {
+								$(this).prop('disabled', false).removeClass('disabled-option');
+							}
+						});
+					});
+
 				}
-
-				console.log('Generated Timeslots for Updating Booking:', generatedTimeslots);
-
-				// Enable options in the "start" and "end" dropdowns for the updating booking's timeslots
-				generatedTimeslots.forEach(slot => {
-					$('select[name="start"] option').each(function () {
-						if (normalizeTimeFormat($(this).text()) === slot) {
-							$(this).prop('disabled', false).removeClass('disabled-option');
-						}
-					});
-					$('select[name="end"] option').each(function () {
-						if (normalizeTimeFormat($(this).text()) === slot) {
-							$(this).prop('disabled', false).removeClass('disabled-option');
-						}
-					});
-					// Additionally enable the exact end time of the updating booking
-    				$('select[name="end"] option').each(function () {
-        			if (normalizeTimeFormat($(this).text()) === updatingEndTime) {
-           			$(this).prop('disabled', false).removeClass('disabled-option');
-       			   		}
-    				});
-				});
-				
-			}
 
 			},
 			error: function (error) {
@@ -917,7 +925,7 @@ $(document).ready(function () {
 
 	// Function to validate the start and end times
 	function validateTimes() {
-	
+
 		var selectedDate = $('#datepicker').val();
 		const startTime = $startTime.val();
 		const endTime = $endTime.val();
@@ -927,22 +935,21 @@ $(document).ready(function () {
 			const updatingStartTime = updatingBooking.start_time; // Assuming format "HH:mm:ss"
 			const updatingEndTime = updatingBooking.end_time; // Assuming format "HH:mm:ss"
 
-		
+
 			let commenceTime = new Date(`1970-01-01T${updatingStartTime}`);
 			const finishTime = new Date(`1970-01-01T${updatingEndTime}`);
 
 			// Generate all timeslots between the start and end times
 			while (commenceTime < finishTime) {
 				const slotTime = `${commenceTime.getHours().toString().padStart(2, '0')}:` +
-					`${commenceTime.getMinutes().toString().padStart(2, '0')}:` +
-					`${commenceTime.getSeconds().toString().padStart(2, '0')}`;
+					`${commenceTime.getMinutes().toString().padStart(2, '0')}`;
 				generatedUpdatingTimeslots.push(slotTime);
 				commenceTime.setHours(commenceTime.getHours() + 1);
 			}
-			
+
 			const matchingItems = generatedUpdatingTimeslots.filter(item => timeslots.includes(item));
 		}
-			console.log('Generated Timeslots for Updating Booking:', generatedUpdatingTimeslots);
+		console.log('Generated Timeslots for Updating Booking:', generatedUpdatingTimeslots);
 
 		// Remove any existing warning message
 		$('#end-time-error').remove();
@@ -955,26 +962,25 @@ $(document).ready(function () {
 			let commenceTime = new Date(`1970-01-01T${startTime}`); // Convert to Date object
 			let FinishTime = new Date(`1970-01-01T${endTime}`);     // Convert to Date object
 
-			
+
 			while (commenceTime < FinishTime) {
 				// Format the current time into "HH:mm:ss"
 				const slotTime = `${commenceTime.getHours().toString().padStart(2, '0')}:` +
-					`${commenceTime.getMinutes().toString().padStart(2, '0')}:` +
-					`${commenceTime.getSeconds().toString().padStart(2, '0')}`;
+					`${commenceTime.getMinutes().toString().padStart(2, '0')}`;
 				generatedTimeslots.push(slotTime);
 				// Increment the start time by 1 hour
 				commenceTime.setHours(commenceTime.getHours() + 1);
 			}
 
 			console.log(`timeslots : ${timeslots}`);
-			console.log(`genrated timeslots : ${generatedTimeslots}`);
+			console.log(`generated timeslots : ${generatedTimeslots}`);
 
 			// Remove conflicts caused by the timeslot being edited
 			const relevantTimeslots = isHomePage
-            ? timeslots
-            : timeslots.filter(slot => !generatedUpdatingTimeslots.includes(slot));
+				? timeslots
+				: timeslots.filter(slot => !generatedUpdatingTimeslots.includes(slot));
 
-        const matchingItems = generatedTimeslots.filter(item => relevantTimeslots.includes(item));
+			const matchingItems = generatedTimeslots.filter(item => relevantTimeslots.includes(item));
 
 			if (matchingItems.length > 0) {
 				console.log('Matching items found:', matchingItems);
@@ -1015,7 +1021,7 @@ $(document).ready(function () {
 	$startTime.on('change', validateTimes);
 	$endTime.on('change', validateTimes);
 
-	
+
 
 	// Function to check the input value
 	function checkInput() {
@@ -1034,14 +1040,14 @@ $(document).ready(function () {
 		}
 	}
 
-	
+
 
 	// Attach event listener to input
 	$purposeInput.on('input', checkInput);
 	$('button[title="Edit"]').on('click', function (event) {
 		$nextButton.prop('disabled', false);
-		
-	 });
+
+	});
 
 	// Initial check when the page loads
 	checkInput();

@@ -328,7 +328,6 @@ app.get("/bookinglist", async (req, res) => {
   }
 });
 
-
 app.get("/mybookings", async (req, res) => {
   if (req.isAuthenticated()) {
     const currentDate = moment().format("YYYY-MM-DD");
@@ -419,6 +418,8 @@ app.get('/edit-booking/:id', async (req, res) => {
 
     // Format the date to DD-MM-YYYY
     booking.date = moment(booking.date).format('DD-MM-YYYY');
+    booking.start_time = moment(booking.start_time, 'HH:mm:ss').format('HH:mm'); // Adjust format as needed
+    booking.end_time = moment(booking.end_time, 'HH:mm:ss').format('HH:mm'); // Adjust format as needed
 
     res.render('editBookings.ejs', { booking });
   } catch (error) {
@@ -459,7 +460,10 @@ app.post('/next', async (req, res) => {
       );
 
       // Step 4: Extract timeslots and end_times
-      const timeslots = timeslotsResult.rows.map(row => row.timeslot);
+      const timeslots = timeslotsResult.rows.map(row => {
+        const [hours, minutes] = row.timeslot.trim().split(':'); // Split the timeslot by ':'
+        return `${hours}:${minutes}`; // Return only hours and minutes
+    });
       const endTimes = bookingsResult.rows.map(row => row.end_time);  // Get end_times from the bookings table
       const startTimes = bookingsResult.rows.map(row => row.start_time);
 

@@ -86,7 +86,7 @@
                     <p class="doctorname_text">Start Time</p>
                     <select class="email_text" name="start" required>
                       <!-- <select class="email_text" name="start" required> -->
-                        <% ['08:00:00', '09:00:00', '10:00:00', '11:00:00', '12:00:00','13:00:00', '14:00:00', '15:00:00', '16:00:00', '17:00:00'].forEach(time => { %>
+                        <% ['08:00', '09:00', '10:00', '11:00', '12:00','13:00', '14:00', '15:00', '16:00', '17:00'].forEach(time => { %>
                             <option value="<%= time %>" <%= booking.start_time === time ? 'selected' : '' %>><%= time %></option>
                         <% }); %>
                     </select>
@@ -108,7 +108,7 @@
                   <div class="form-group">
                     <p class="doctorname_text">End Time</p>
                     <select class="email_text" name="end" required>
-                      <% ['09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00', '15:00:00', '16:00:00', '17:00:00', '18:00:00' ].forEach(time => { %>
+                      <% ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00' ].forEach(time => { %>
                           <option value="<%= time %>" <%= booking.end_time === time ? 'selected' : '' %>><%= time %></option>
                       <% }); %>
                       <!-- <option>Select Your End Time</option>
