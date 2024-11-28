@@ -6,7 +6,8 @@
       <div class="row">
         <div class="col-md-12">
           <h1 class="banner_taital">Space For Your Ideas</h1>
-          <p  id="homePage" class="banner_text">Unlock your creativity by booking the meeting room at the Enabling Technology
+          <p id="homePage" class="banner_text">Unlock your creativity by booking the meeting room at the Enabling
+            Technology
             Collaboratory. Our innovative space is designed for collaboration and brainstorming, allowing you to
             connect with others and bring your ideas to life. </p>
           <div id="scrollButton" class="read_bt"><a style="color: white;">Book Now</a></div>
@@ -34,7 +35,7 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <p class="doctorname_text">Number of Attendees</p>
-                  <select class="email_text" name="attendees">
+                  <select class="wide" name="attendees">
                     <option value="">Maximum Attendees</option>
                     <option value="02">02</option>
                     <option value="04">04</option>
@@ -47,7 +48,7 @@
               </div>
               <div class="col-md-6">
                 <p class="doctorname_text_date">Choose Date</p>
-                <input id="datepicker" required autocomplete="off"/>
+                <input id="datepicker" required autocomplete="off" />
                 <input type="hidden" name="date" id="hiddenDate" hidden required>
               </div>
             </div>
@@ -83,38 +84,58 @@
                 <div class="col-md-6">
                   <div class="form-group">
                     <p class="doctorname_text">Start Time</p>
-                    <select class="email_text" name="start" required>
+                    <select class="wide" name="start" required>
                       <option>Select Your Start Time</option>
-                      <option value="08:00:00">08:00 </option>
-                      <option value="09:00:00">09:00 </option>
-                      <option value="10:00:00">10:00 </option>
-                      <option value="11:00:00">11:00 </option>
-                      <option value="12:00:00">12:00 </option>
-                      <option value="13:00:00">13:00 </option>
-                      <option value="14:00:00">14:00 </option>
-                      <option value="15:00:00">15:00 </option>
-                      <option value="16:00:00">16:00 </option>
-                      <option value="17:00:00">17:00 </option>
+                      <option value="08:00:00">08:00</option>
+                      <option value="08:30:00">08:30</option>
+                      <option value="09:00:00">09:00</option>
+                      <option value="09:30:00">09:30</option>
+                      <option value="10:00:00">10:00</option>
+                      <option value="10:30:00">10:30</option>
+                      <option value="11:00:00">11:00</option>
+                      <option value="11:30:00">11:30</option>
+                      <option value="12:00:00">12:00</option>
+                      <option value="12:30:00">12:30</option>
+                      <option value="13:00:00">13:00</option>
+                      <option value="13:30:00">13:30</option>
+                      <option value="14:00:00">14:00</option>
+                      <option value="14:30:00">14:30</option>
+                      <option value="15:00:00">15:00</option>
+                      <option value="15:30:00">15:30</option>
+                      <option value="16:00:00">16:00</option>
+                      <option value="16:30:00">16:30</option>
+                      <option value="17:00:00">17:00</option>
+                      <option value="17:30:00">17:30</option>
                     </select>
-                  </div>
+                </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
                     <p class="doctorname_text">End Time</p>
-                    <select class="email_text" name="end" required>
+                    <select class="wide" name="end" required>
                       <option>Select Your End Time</option>
-                      <option value="09:00:00">09:00 </option>
-                      <option value="10:00:00">10:00 </option>
-                      <option value="11:00:00">11:00 </option>
-                      <option value="12:00:00">12:00 </option>
-                      <option value="13:00:00">13:00 </option>
-                      <option value="14:00:00">14:00 </option>
-                      <option value="15:00:00">15:00 </option>
-                      <option value="16:00:00">16:00 </option>
-                      <option value="17:00:00">17:00 </option>
-                      <option value="18:00:00">18:00 </option>
+                      <option value="08:30:00">08:30</option>
+                      <option value="09:00:00">09:00</option>
+                      <option value="09:30:00">09:30</option>
+                      <option value="10:00:00">10:00</option>
+                      <option value="10:30:00">10:30</option>
+                      <option value="11:00:00">11:00</option>
+                      <option value="11:30:00">11:30</option>
+                      <option value="12:00:00">12:00</option>
+                      <option value="12:30:00">12:30</option>
+                      <option value="13:00:00">13:00</option>
+                      <option value="13:30:00">13:30</option>
+                      <option value="14:00:00">14:00</option>
+                      <option value="14:30:00">14:30</option>
+                      <option value="15:00:00">15:00</option>
+                      <option value="15:30:00">15:30</option>
+                      <option value="16:00:00">16:00</option>
+                      <option value="16:30:00">16:30</option>
+                      <option value="17:00:00">17:00</option>
+                      <option value="17:30:00">17:30</option>
+                      <option value="18:00:00">18:00</option>
                     </select>
-                  </div>
+                </div>
                 </div>
               </div>
               <div class="row">
@@ -155,19 +176,19 @@
           <h1 class="about_taital">About ETC</h1>
           <p class="about_text">Welcome to the Enabling Technology Collaboration Center at Temasek Polytechnic!
             We are a vibrant hub dedicated to innovation, where creativity meets technology.</p>
-            <% if (datesWithTooManyTimeSlots.length > 0) { %>
-              <!-- <div style="text-align: center; background-color: #f44336; color: white; padding: 20px; border-radius: 8px; margin-top: 20px;"> -->
-                <h1 style="font-size: 2.0em;">We are fully booked on:</h1>
-                <ul style="list-style-type: none;">
-                  <% datesWithTooManyTimeSlots.forEach(date => { %>
-                    <li style="font-size: 1.2em; margin-right: 50px; display: inline-block;">
-                      <%= date %>
-                    </li>
-                  <% }); %>
-                </ul>
-              <!-- </div> -->
-            <% } %>            
-          <div class="about_bt"><a href="about.html">Read More</a></div>
+          <% if (datesWithTooManyTimeSlots.length> 0) { %>
+            <!-- <div style="text-align: center; background-color: #f44336; color: white; padding: 20px; border-radius: 8px; margin-top: 20px;"> -->
+            <h1 style="font-size: 2.0em;">We are fully booked on:</h1>
+            <ul style="list-style-type: none;">
+              <% datesWithTooManyTimeSlots.forEach(date=> { %>
+                <li style="font-size: 1.2em; margin-right: 50px; display: inline-block;">
+                  <%= date %>
+                </li>
+                <% }); %>
+            </ul>
+            <!-- </div> -->
+            <% } %>
+              <div class="about_bt"><a href="about.html">Read More</a></div>
         </div>
         <div class="col-md-6">
           <div class="about_img"><img src="images/about-img.png"></div>

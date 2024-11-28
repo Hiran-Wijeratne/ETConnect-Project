@@ -582,7 +582,7 @@ $('#toggleMyPastBookings').on('click', function () {
 	}
 });
 
-
+  
 
 
 
@@ -608,8 +608,12 @@ function onDateChange($datepickerElement) {
 	$('select[name="start"]').val('');
 	$('select[name="end"]').val('');
 	$('#end-time-error').remove();
+	$('select').niceSelect('update');
 }
 
+$(document).ready(function () {
+	$('select').niceSelect();
+});
 
 
 
@@ -817,40 +821,59 @@ $(document).ready(function () {
 				console.log('Normalized Timeslots:', normalizedTimeslots);
 				console.log('Normalized Start Times:', normalizedStartTimes);
 
-				// Disable corresponding options in the "end" select dropdown based on end_time
 				normalizedEndTimes.forEach(endTime => {
 					$('select[name="end"] option').each(function () {
 						if (normalizeTimeFormat($(this).text()) === endTime) {
 							$(this).prop('disabled', true).addClass('disabled-option');
+							$(this).closest('.nice-select').find('.option').each(function() {
+								if ($(this).text() === endTime) {
+									$(this).addClass('disabled');
+								}
+							});
 						}
 					});
 				});
-
+		
 				// Disable corresponding options in the "start" and "end" select dropdowns based on timeslots
 				normalizedTimeslots.forEach(slot => {
 					$('select[name="start"] option').each(function () {
 						if (normalizeTimeFormat($(this).text()) === slot) {
 							$(this).prop('disabled', true).addClass('disabled-option');
+							$(this).closest('.nice-select').find('.option').each(function() {
+								if ($(this).text() === slot) {
+									$(this).addClass('disabled');
+								}
+							});
 						}
 					});
-
+		
 					// Disable the corresponding option in the "end" select dropdown
 					$('select[name="end"] option').each(function () {
 						if (normalizeTimeFormat($(this).text()) === slot) {
 							$(this).prop('disabled', true).addClass('disabled-option');
+							$(this).closest('.nice-select').find('.option').each(function() {
+								if ($(this).text() === slot) {
+									$(this).addClass('disabled');
+								}
+							});
 						}
 					});
 				});
-
+		
 				// Enable corresponding options in the "end" select dropdown based on start_time
 				normalizedStartTimes.forEach(startTime => {
 					$('select[name="end"] option').each(function () {
 						if (normalizeTimeFormat($(this).text()) === startTime) {
 							$(this).prop('disabled', false).removeClass('disabled-option');
+							$(this).closest('.nice-select').find('.option').each(function() {
+								if ($(this).text() === startTime) {
+									$(this).removeClass('disabled');
+								}
+							});
 						}
 					});
 				});
-
+		
 				// **NEW LOGIC**: Disable overlapping times in the "end" dropdown.
 				// If any time in normalizedStartTimes is also in normalizedEndTimes, disable it in the "end" dropdown.
 				normalizedStartTimes.forEach(startTime => {
@@ -859,11 +882,19 @@ $(document).ready(function () {
 							$('select[name="end"] option').each(function () {
 								if (normalizeTimeFormat($(this).text()) === startTime) {
 									$(this).prop('disabled', true).addClass('disabled-option');
+									$(this).closest('.nice-select').find('.option').each(function() {
+										if ($(this).text() === startTime) {
+											$(this).addClass('disabled');
+										}
+									});
 								}
 							});
 						}
 					});
 				});
+
+				$('select').niceSelect('update');
+
 
 				// Generate the timeslots for the updating booking when editing
 				if (!isHomePage) {
