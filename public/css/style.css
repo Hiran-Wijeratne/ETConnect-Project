@@ -655,6 +655,22 @@ button {
     color: #252525;
 }
 
+.call_text_1_time {
+    width: 100%;
+    float: left;
+    font-size: 16px;
+    color: #ffffff;
+    text-align: right;
+}
+
+.call_text_1_time a {
+    color: #ffffff;
+}
+
+/* .call_text_1_time a:hover {
+    color: #252525;
+} */
+
 .call_text_2 {
     width: 100%;
     float: left;
@@ -750,7 +766,7 @@ button {
 }
 
 .custom_menu {
-    width: 78%;
+    width: 70%; /* orginal was 78 */
     float: left;
     padding: 15px 0px 15px 0px;
 }
@@ -766,7 +782,7 @@ button {
     color: #ffffff;
     padding: 7px 24px 7px 24px;
     text-transform: uppercase;
-    margin: 0px 7px;
+    margin: 0px 3px;  /*orginal was 0px 7px*/
     border-radius: 5px;
 }
 

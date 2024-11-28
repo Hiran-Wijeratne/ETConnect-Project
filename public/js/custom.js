@@ -456,9 +456,20 @@ $(document).ready(function () {
 			const [day, month, year] = booking.date.split('-'); // Split the date by '-'
 			const formattedDate = `${year}-${month}-${day}`; // Rearrange to 'YYYY-MM-DD'
 
+			function ensureSeconds(time) {
+				// If time is in HH:mm format, append ':00' to include seconds
+				return time.includes(':') && time.split(':').length === 2 ? `${time}:00` : time;
+			}
+
+			// Construct start and end dates
+			const startTimeWithSeconds = ensureSeconds(booking.start_time);
+			const endTimeWithSeconds = ensureSeconds(booking.end_time);
+
+
 			// Construct the start and end dates
-			const startDate = new Date(`${formattedDate}T${booking.start_time}`);
-			const endDate = new Date(`${formattedDate}T${booking.end_time}`);
+			const startDate = new Date(`${formattedDate}T${startTimeWithSeconds}`);
+			const endDate = new Date(`${formattedDate}T${endTimeWithSeconds}`);
+
 
 			// Create the event object
 			const event = {
@@ -478,7 +489,6 @@ $(document).ready(function () {
 		if (!calendarInstance) {
 			const calendarEl = document.getElementById('calendar');
 			calendarInstance = new FullCalendar.Calendar(calendarEl, {
-				// themeSystem: 'bootstrap',
 				initialView: 'dayGridMonth',
 				events: calendarEvents, // Use the processed events
 				headerToolbar: {
@@ -494,6 +504,16 @@ $(document).ready(function () {
 				hiddenDays: [0, 6], // Hide Sunday (0) and Saturday (6)
 				slotMinTime: '09:00', // Earliest time displayed
 				slotMaxTime: '18:00', // Latest time displayed
+				slotLabelFormat: { // Ensure 24-hour format on time grid views
+					hour: '2-digit',
+					minute: '2-digit',
+					hour12: false
+				},
+				eventTimeFormat: { // Display event times in 24-hour format
+					hour: '2-digit',
+					minute: '2-digit',
+					hour12: false
+				},
 				eventClick: function (info) {
 					// Populate the modal with event details
 					const event = info.event;
@@ -512,8 +532,8 @@ $(document).ready(function () {
 					const fullTitle = info.event.title || 'Unknown';
 					const shortTitle = fullTitle.length > maxLength ? `${fullTitle.substring(0, maxLength)}...` : fullTitle;
 
-					const startTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-					const endTime = info.event.end ? info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+					const startTime = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+					const endTime = info.event.end ? info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'N/A';
 
 					const content = document.createElement('div');
 					content.innerHTML = `<strong>${shortTitle}</strong><br>${startTime} - ${endTime}`;
