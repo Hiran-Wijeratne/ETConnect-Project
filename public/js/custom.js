@@ -551,6 +551,21 @@ $(document).ready(function () {
 	});
 });
 
+
+$(document).ready(function () {
+    // Button to open calendar in a new tab
+    $('#openCalendarNewTab').click(function () {
+        // Redirect to a new calendar page and pass data using query parameters or localStorage
+        window.open('/calendarPage', '_blank');
+    });
+});
+
+
+
+
+
+
+
 // On the current page
 $('button[title="Edit"]').on('click', function () {
 	console.log('Edit button clicked. Navigating to edit page...');

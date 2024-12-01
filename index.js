@@ -543,6 +543,76 @@ app.post('/submit', async (req, res) => {
 }
 });
 
+app.get('/calendarPage', async (req, res) => {
+  const currentDate = moment().format("YYYY-MM-DD");
+  const currentTime = moment().format("HH:mm:ss");
+  const pastLimitDate = moment().subtract(30, "days").format("YYYY-MM-DD"); // Date 30 days ago
+
+  const upcomingQuery = `
+    SELECT 
+      b.booking_id, 
+      u.username, 
+      b.date, 
+      b.start_time, 
+      b.end_time, 
+      b.description, 
+      b.attendees, 
+      DATE(b.created_at) AS booking_date
+    FROM bookings b
+    JOIN users u ON b.user_id = u.user_id
+    WHERE 
+      (b.date > $1) OR 
+      (b.date = $1 AND b.end_time > $2)
+    ORDER BY b.date, b.start_time
+  `;
+
+  const pastQuery = `
+    SELECT 
+      b.booking_id, 
+      u.username, 
+      b.date, 
+      b.start_time, 
+      b.end_time, 
+      b.description, 
+      b.attendees, 
+      DATE(b.created_at) AS booking_date
+    FROM bookings b
+    JOIN users u ON b.user_id = u.user_id
+    WHERE 
+      (
+        (b.date < $1 AND b.date >= $3) OR 
+        (b.date = $1 AND b.end_time <= $2)
+      )
+    ORDER BY b.date DESC, b.start_time DESC
+  `;
+
+  try {
+    const upcomingResult = await pool.query(upcomingQuery, [currentDate, currentTime]);
+    const pastResult = await pool.query(pastQuery, [currentDate, currentTime, pastLimitDate]);
+
+    const formatBookings = (rows) =>
+      rows.map(row => ({
+        booking_id: row.booking_id,
+        username: row.username,
+        date: moment(row.date).format("DD-MM-YYYY"),
+        start_time: row.start_time,
+        end_time: row.end_time,
+        description: row.description,
+        attendees: row.attendees,
+        booking_date: moment(row.booking_date).format("DD-MM-YYYY"),
+      }));
+
+    const upcomingBookings = formatBookings(upcomingResult.rows);
+    const pastBookings = formatBookings(pastResult.rows);
+
+    // Render calendar.ejs and pass the bookings as JSON
+    res.render('calendar.ejs',{ upcomingBookings, pastBookings });
+  } catch (err) {
+    console.error("Error retrieving bookings:", err);
+    res.status(500).send("Error retrieving bookings.");
+  }
+});
+
 app.post('/edit', async (req, res) => {
   if (req.isAuthenticated()) {
     // Extract bookingId and other fields from the form submission

@@ -324,6 +324,47 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
     width: 100%;
 }
 
+
+
+.about_bt_calendar_view {
+    width: 180px;
+    float: left;
+    padding-top: 50px;
+    display: flex;
+    /* align-items: center; */
+}
+
+.about_bt_calendar_view a {
+    width: 100%;
+    float: left;
+    font-size: 16px;
+    background-color: #252525;
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.about_bt_calendar_view a:hover {
+    color: #ffffff;
+    background-color: #0cb7d6;
+}
+
+
+#calendarView {
+    margin-right: 10px; /* Space between buttons */
+}
+
+#openCalendarNewTab {
+    width: auto; /* Adjust width as needed */
+    font-size: 0.9em; /* Make the button slightly smaller */
+    /* height: 38px; */
+}
+
+
+
 .fc-event-title {
     font-size: 15px important!; /* Adjust event title font size */
     white-space: nowrap;
@@ -344,6 +385,25 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
     color: white; /* Text color */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
 }
+
+ /* Style for upcoming events */
+ .fc-event.upcoming-booking {
+    padding: 2px; /* Reduce padding */
+    border-radius: 5px; /* Add rounded corners */
+    background-color: #0cb7d6; /* Custom background color */
+    color: white; /* Text color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+/* Style for past events */
+.fc-event.past-booking {
+    background-color: #94c0c8; /* Red background */
+    color: white; /* White text */
+    border: none; /* No border */
+    opacity: 0.7; /* Make past events slightly transparent */
+}
+
+
 
 /* Add this to your CSS or inline styles */
 .modal-backdrop {
