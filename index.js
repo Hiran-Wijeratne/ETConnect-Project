@@ -519,18 +519,21 @@ app.post('/submit', async (req, res) => {
       startTime.setMinutes(startTime.getMinutes() + 30);
     }
 
-    // res.send({ message: 'Form submitted successfully', timeslots, formattedDate });
-    // res.redirect('/');
-    res.render('confirmation.ejs', {
-      booking: {
-        id: bookingId,
-        date: `${day}-${month}-${year}`, // Reformat for display
-        startTime: start,
-        endTime: end,
-        attendees,
-        purpose,
-      },
-    });
+    // Prepare the booking data to pass in the URL
+    const bookingData = {
+      id: bookingId,
+      date: formattedDate,
+      startTime: start,
+      endTime: end,
+      attendees: attendees,
+      purpose: purpose
+    };
+
+    // Step 3: Redirect to confirmation page with the entire booking data as query parameters
+    const queryParams = new URLSearchParams(bookingData).toString();
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.redirect(`/confirmation?${queryParams}`);
   } catch (error) {
     console.error('Error saving booking:', error);
     res.status(500).send('Error saving booking');

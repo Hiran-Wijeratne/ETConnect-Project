@@ -627,7 +627,20 @@ $(document).ready(function () {
 	$('select').niceSelect();
 });
 
+$(document).ready(function () {
+	$('#appointmentForm')[0].reset();
+});
 
+$(window).on('pageshow', function (event) {
+  if (event.originalEvent && event.originalEvent.persisted) {
+    $('#appointmentForm')[0].reset();
+  }
+  });
+  $(window).on('pageshow', function (event) {
+	if (event.originalEvent && event.originalEvent.persisted) {
+	  window.location.reload();
+	}
+  });
 
 
 $(document).ready(function () {
