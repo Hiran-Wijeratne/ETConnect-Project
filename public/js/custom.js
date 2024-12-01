@@ -1059,8 +1059,9 @@ $(document).ready(function () {
 
 		// Remove any existing warning message
 		$('#end-time-error').remove();
+		const startsWithZeroOrOne = /^[01]/;
 
-		if (startTime !== "Select Your Start Time" && endTime !== "Select Your End Time") {
+		if (startsWithZeroOrOne.test(startTime) && startsWithZeroOrOne.test(endTime))  {
 
 			// Step 2: Generate timeslots and insert them into the timeslots table
 			const generatedTimeslots = [];
