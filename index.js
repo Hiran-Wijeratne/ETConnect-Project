@@ -233,7 +233,7 @@ passport.use("google",
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://your-app.onrender.com/auth/google/callback",
+      callbackURL: "https://etconnect-project.onrender.com/auth/google/callback",
       userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
     },
     async (accessToken, refreshToken, profile, cb) => {
