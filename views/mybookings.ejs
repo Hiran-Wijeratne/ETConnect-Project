@@ -35,13 +35,13 @@
     <table id="myUpcomingTable" class="display" style="width:100%">
         <thead>
             <tr>
-                <th>Booking ID</th>
+                <th>ID</th>
                 <!-- <th>Username</th> -->
                 <th>Meeting Date</th>
                 <th>Start Time</th>
                 <th>End Time</th>
-                <!-- <th>Description</th>
-                <th>Attendees</th> -->
+                <th>Description</th>
+                <th>Pax</th>
                 <th>Created Date</th>
                 <th>Actions</th>
 
@@ -63,7 +63,12 @@
                     <td>
                         <%= booking.end_time %>
                     </td>
-                   
+                    <td>
+                        <%= booking.description %>
+                    </td>
+                    <td>
+                        <%= booking.attendees %>
+                    </td>
                     <td>
                         <%= booking.booking_date %>
                     </td>
@@ -86,10 +91,12 @@
     <table id="myPastTable" class="display" style="width:100%">
         <thead>
             <tr>
-                <th>Booking ID</th>
+                <th>ID</th>
                 <th>Meeting Date</th>
                 <th>Start Time</th>
                 <th>End Time</th>
+                <th>Description</th>
+                <th>Pax</th>
                 <th>Created Date</th>
             </tr>
         </thead>
@@ -109,7 +116,12 @@
                     <td>
                         <%= booking.end_time %>
                     </td>
-                   
+                    <td>
+                        <%= booking.description %>
+                    </td>
+                    <td>
+                        <%= booking.attendees %>
+                    </td>
                     <td>
                         <%= booking.booking_date %>
                     </td>
