@@ -199,6 +199,8 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
     font-weight: bold;
 }
 
+
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .booking-item {
@@ -211,6 +213,16 @@ input[type="submit"].read_bt_submit_button:disabled:hover {
         width: calc(100% - 20px); /* Full-width layout for mobile screens */
     }
 }
+
+/* @media (min-width: 768px) and (max-width: 991px)  {
+    .custom_bg {
+       display: block !important; 
+    }
+    .custom_menu{
+        display: block !important; 
+     }
+ }
+  */
 
 .booking-title {
     font-size: 1.5rem;
@@ -799,7 +811,7 @@ button {
 }
 
 .custom_menu {
-    width: 70%; /* orginal was 78 */
+    width: 78%; /* orginal was 78 */
     float: left;
     padding: 15px 0px 15px 0px;
 }
