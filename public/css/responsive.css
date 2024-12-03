@@ -556,7 +556,7 @@
     }
 }
 
-@media (max-width: 575px) {
+@media (min-width: 389px) and (max-width: 575px) {
     .header_section {
         background-size: 100% 100%;
     }
@@ -608,6 +608,173 @@
 
     .custom_menu {
         width: 30%;
+        padding: 15px 0px 15px 0px;
+    }
+
+
+    /* .search_btn {
+        display: none;
+    } */
+    .custom_menu li a {
+        display: none;
+    }
+
+    .banner_taital {
+        font-size: 30px;
+        padding-top: 20px;
+    }
+
+    .banner_text {
+        width: 100%;
+    }
+
+    .appointment_box {
+        padding: 40px 20px;
+        top: -100px;
+    }
+
+    .appointment_taital {
+        font-size: 24px;
+    }
+
+    p.doctorname_text {
+        padding-top: 20px;
+    }
+
+    .about_taital {
+        font-size: 30px;
+        padding-top: 0;
+    }
+
+    .about_img img {
+        width: 100%;
+        float: left;
+        margin-top: 40px;
+    }
+
+    .image_1 img {
+        width: 100%;
+    }
+
+    .treatment_taital {
+        font-size: 29px;
+    }
+
+    .doctores_taital {
+        font-size: 30px;
+    }
+
+    .doctores_section {
+        border-radius: 20px;
+    }
+
+    #my_slider a.carousel-control-prev {
+        left: -90px;
+        top: 170px;
+        display: none;
+    }
+
+    #my_slider a.carousel-control-next {
+        right: -90px;
+        top: 170px;
+        display: none;
+    }
+
+    .testimonial_taital {
+        font-size: 30px;
+    }
+
+    #main_slider a.carousel-control-prev {
+        left: -110px;
+        top: 60px;
+        display: none;
+    }
+
+    #main_slider a.carousel-control-next {
+        right: -110px;
+        top: 60px;
+        display: none;
+    }
+
+    .box_main {
+        width: 100%;
+        padding: 40px 20px 40px 20px;
+    }
+
+    .contact_taital {
+        font-size: 30px;
+        padding-left: 0px;
+    }
+
+    .mail_section_1 {
+        padding-left: 0px;
+    }
+
+    .padding_left_15 {
+        padding: 0px;
+    }
+
+    .input_bt {
+        width: 100%;
+    }
+
+    .footer_taital {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 389px) {
+    .header_section {
+        background-size: 100% 100%;
+    }
+
+    .navbar-expand-lg {
+        padding: 15px 0px;
+    }
+
+    .navbar-brand {
+        width: auto;
+        padding: 0px;
+    }
+
+    .navbar {
+        padding: 10px 0px;
+    }
+
+    .navbar-toggler {
+        background-color: #fff;
+        border: 1px solid #fff;
+    }
+
+    .navbar-nav.ml-auto {
+        display: block;
+    }
+
+    .header_top_section {
+        display: none;
+    }
+
+
+
+
+
+
+    
+
+
+
+    .search_btn li a {
+        padding: 2px 6px 2px 6px;
+        margin: 0px;
+        font-size: 18px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .custom_menu {
+        width: 25%;
         padding: 15px 0px 15px 0px;
     }
 
