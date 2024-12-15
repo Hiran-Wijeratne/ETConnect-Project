@@ -7,6 +7,10 @@
 /*------------------
 	Brands Slider
 --------------------*/
+
+
+///Added a comment to push git repository to the git hub
+
 $('#client-carousel').owlCarousel({
 	nav: false,
 	loop: true,
